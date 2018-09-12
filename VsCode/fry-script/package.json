@@ -1,0 +1,26 @@
+{
+    "name": "fry-script",
+    "displayName": "Fry Script",
+    "description": "Fry Script language support",
+    "version": "0.0.1",
+    "publisher": "asd",
+    "engines": {
+        "vscode": "^1.27.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "fryscript",
+            "aliases": ["Fry Script", "fryscript"],
+            "extensions": [".fry"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "fryscript",
+            "scopeName": "source.fry",
+            "path": "./syntaxes/fryscript.tmLanguage.json"
+        }]
+    }
+}
