@@ -24,7 +24,7 @@
 				},
 				{
 					"name": "keyword.fryscript",
-					"match": "\\B@import|@extend|@proto\\B"
+					"match": "(^@\\b(import|extend|proto)\\b)"
 				},
 				{
 					"name": "keyword.fryscript",
