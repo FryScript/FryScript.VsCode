@@ -11,16 +11,28 @@
         "Programming Languages"
     ],
     "contributes": {
-        "languages": [{
-            "id": "fryscript",
-            "aliases": ["Fry Script", "fryscript"],
-            "extensions": [".fry"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "fryscript",
-            "scopeName": "source.fry",
-            "path": "./syntaxes/fryscript.tmLanguage.json"
-        }]
+        "languages": [
+            {
+                "id": "fryscript",
+                "aliases": [
+                    "Fry Script",
+                    "fryscript"
+                ],
+                "extensions": [
+                    ".fry"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "fryscript",
+                "scopeName": "source.fry",
+                "path": "./syntaxes/fryscript.tmLanguage.json"
+            }
+        ]
+    },
+    "dependencies": {
+        "vscode-languageserver": "^5.1.0"
     }
 }
