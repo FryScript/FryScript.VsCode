@@ -1,5 +1,5 @@
 {
-    "name": "fry-script",
+    "name": "fryscript",
     "displayName": "Fry Script",
     "description": "Fry Script language support",
     "version": "0.0.1",
@@ -10,6 +10,10 @@
     "categories": [
         "Programming Languages"
     ],
+    "activationEvents": [
+        "onLanguage:fryscript"
+    ],
+    "main": "./out/client/src/test",
     "contributes": {
         "languages": [
             {
@@ -32,7 +36,14 @@
             }
         ]
     },
-    "dependencies": {
+    "scripts": {
+        "compile": "tsc -b",
+        "watch": "tsc -b -w"
+    },
+    "devDependencies": {
+        "@types/node": "^10.12.10",
+        "tslint": "^5.11.0",
+        "typescript": "^3.1.6",
         "vscode-languageserver": "^5.1.0"
     }
 }
