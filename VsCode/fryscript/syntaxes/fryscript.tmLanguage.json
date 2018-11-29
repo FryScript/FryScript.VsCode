@@ -20,7 +20,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.fryscript",
-					"match": "\\b(if|else|while|for|foreach|return|yield|await|break|continue|in|try|catch|finally|throw)\\b"
+					"match": "\\b(if|else|while|for|foreach|return|yield|await|break|continue|in|try|catch|finally|throw|out)\\b"
 				},
 				{
 					"name": "keyword.fryscript",
