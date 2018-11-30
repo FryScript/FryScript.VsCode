@@ -28,7 +28,7 @@
 				},
 				{
 					"name": "keyword.fryscript",
-					"match": "\\b(var|fibre|as|extend|extends|has|params|base|this|new)\\b"
+					"match": "\\b(var|fibre|as|from|extend|extends|has|params|base|this|new)\\b"
 				}
 			]
 		},
@@ -56,7 +56,7 @@
 				},
 				{
 					"name": "constant.numeric.fryscript",
-					"match": "\\d"
+					"match": "\\b\\d+\\b"
 				}
 			]
 		},
