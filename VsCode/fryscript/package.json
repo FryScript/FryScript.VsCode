@@ -13,7 +13,7 @@
     "activationEvents": [
         "onLanguage:fryscript"
     ],
-    "main": "./out/client/src/test",
+    "main": "./out/client/src/client",
     "contributes": {
         "languages": [
             {
@@ -44,6 +44,10 @@
         "@types/node": "^10.12.10",
         "tslint": "^5.11.0",
         "typescript": "^3.1.6",
-        "vscode-languageserver": "^5.1.0"
+        "vscode": "^1.1.22",
+        "vscode-languageclient": "^5.1.1"
+    },
+    "dependencies": {
+        "dotnet-2.1": "^2.1.0"
     }
 }
