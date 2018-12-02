@@ -39,7 +39,7 @@ export function activate(context: ExtensionContext) {
 	
 	// Create the language client and start the client.
 	let disposable = new LanguageClient('lspSample', 'Language Server Example', serverOptions, clientOptions).start();
-	
+
 	// Push the disposable to the context's subscriptions so that the 
 	// client can be deactivated on extension deactivation
 	context.subscriptions.push(disposable);

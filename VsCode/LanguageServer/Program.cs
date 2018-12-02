@@ -203,6 +203,7 @@ namespace LanguageServer2
         {
             _protocols["initialize"] = new Protocol<InitializeParams, object>(new Action<InitializeParams, Client<object>>(Initialize));
             _protocols["textDocument/didChange"] = new Protocol<DidChangeTextDocumentParams, object>(new Action<DidChangeTextDocumentParams, Client<object>>(TextDocumentDidChange));
+            _protocols["textDocument/completion"] = new Protocol<CompletionParams, CompletionItem[]>(new Action<CompletionParams, Client<CompletionItem[]>>(Completion));
         }
 
         public class ProtocolVoid
@@ -218,7 +219,11 @@ namespace LanguageServer2
                     textDocumentSync = 1,
                     completionProvider = new
                     {
-                        resolveProvider = true
+                        resolveProvider = true,
+                        triggerCharacters = new[]
+                        {
+                            "."
+                        }
                     }
                 }
             });
@@ -226,24 +231,23 @@ namespace LanguageServer2
 
         public virtual void TextDocumentDidChange(DidChangeTextDocumentParams @params, Client<object> client)
         {
-            client.ShowMessage("New changes!");
+            //client.ShowMessage("New changes!");
         }
 
-        //[ProtocolMethod("initialize")]
-        //public virtual void Initialize(RequestContext<InitializeParams> context)
-        //{
-        //    context.Connection.Response(new
-        //    {
-        //        capabilities = new
-        //        {
-        //            textDocumentSync = 1,
-        //            completionProvider = new
-        //            {
-        //                resolveProvider = true
-        //            }
-        //        }
-        //    });
-        //}
+        public virtual void Completion(CompletionParams @params, Client<CompletionItem[]> client)
+        {
+            client.Response(new[]
+            {
+                new CompletionItem
+                {
+                    Label = "Mr"
+                },
+                new CompletionItem
+                {
+                    Label = "McGoo"
+                }
+            });
+        }
 
         public virtual void Initialize(ProtocolVoid @params, Client<ProtocolVoid> client)
         {
@@ -311,6 +315,80 @@ namespace LanguageServer2
     public class InitializeParams
     {
 
+    }
+
+    public class CompletionParams
+    {
+        public CompletionContext context;
+    }
+
+    public class CompletionContext
+    {
+        public CompletionTriggerKind TriggerKind;
+
+        public string TriggerCharacter;
+    }
+
+    public enum CompletionTriggerKind
+    {
+        Invoked = 1,
+        TriggerCharacter = 2,
+        TriggerForIncompleteCompletions = 3
+    }
+
+    public class CompletionItem
+    {
+        public string Label;
+
+        public int Kind;
+
+        public string Detail;
+
+        public string Documentation;
+
+        public bool Deprecated;
+
+        public bool Preselect;
+
+        public string SortText;
+
+        public string FilterText;
+
+        public string InsertText;
+
+        public InsertTextFormat InsertTextFormat;
+
+        public TextEdit TextEdit;
+
+        public TextEdit[] AdditionalTextEdits;
+
+        public string[] CommitCharacters;
+
+        public ClientCommand Command;
+
+        public object Data;
+    }
+
+    public class ClientCommand
+    {
+        public string Title;
+
+        public string Command;
+
+        public object[] Arguments;
+    }
+
+    public enum InsertTextFormat
+    {
+        PlainText = 1,
+        Snippet = 2
+    }
+
+    public class TextEdit
+    {
+        public Range Range;
+
+        public string NewText;
     }
 
     public class DidChangeTextDocumentParams
