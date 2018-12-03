@@ -231,7 +231,34 @@ namespace LanguageServer2
 
         public virtual void TextDocumentDidChange(DidChangeTextDocumentParams @params, Client<object> client)
         {
-            //client.ShowMessage("New changes!");
+            client.Response(null);
+            client.Diagnostics(new PublishDiagnosticsParams
+            {
+                Uri = @params.TextDocument.Uri,
+                Diagnostics = new[]
+                {
+                    new Diagnostic
+                    {
+                        Severity = DiagnosticSeverity.Error,
+                        Source = "Fry Script",
+                        Message = "This is an error dude!",
+                        Range = new Range
+                        {
+                            Start = new Position
+                            {
+                                Line = 0,
+                                Character = 0
+                            },
+                             End = new Position
+                            {
+                                Line = 0,
+                                Character = 10
+                            },
+                        }
+                    }
+                }
+            });
+
         }
 
         public virtual void Completion(CompletionParams @params, Client<CompletionItem[]> client)
@@ -431,11 +458,55 @@ namespace LanguageServer2
         public int Version { get; set; }
     }
 
+    public class Diagnostic
+    {
+        public Range Range;
+
+        public DiagnosticSeverity Severity;
+
+        public int Code;
+
+        public string Source;
+
+        public string Message;
+
+        DiagnosticRelatedInformation[] RelatedInformation;
+    }
+
+    public enum DiagnosticSeverity
+    {
+        Error = 1,
+        Warning = 2,
+        Information = 3,
+        Hint = 4
+    }
+
+    public class DiagnosticRelatedInformation
+    {
+        public Location Location;
+
+        public string Message;
+    }
+
+    public class PublishDiagnosticsParams
+    {
+        public string Uri;
+
+        public Diagnostic[] Diagnostics;
+    }
+
+    public class Location
+    {
+        public string Uri;
+
+        public Range Range;
+    }
+
     public interface IClient
     {
         void Response(object result);
 
-        void Diagnostics<T>(T diagnostics);
+        void Diagnostics(PublishDiagnosticsParams @params);
 
         void ShowMessage(string message);
     }
@@ -449,7 +520,7 @@ namespace LanguageServer2
             _client = client;
         }
 
-        public void Diagnostics<T1>(T1 diagnostics)
+        public void Diagnostics(PublishDiagnosticsParams diagnostics)
         {
             _client.Diagnostics(diagnostics);
         }
@@ -482,9 +553,15 @@ namespace LanguageServer2
             _responseHandler = responseHandler;
         }
 
-        public void Diagnostics<T>(T diagnostics)
+        public void Diagnostics(PublishDiagnosticsParams diagnostics)
         {
-            throw new NotImplementedException();
+            var response = new
+            {
+                method = "textDocument/publishDiagnostics",
+                @params = diagnostics
+            };
+
+            _responseHandler.Push(response);
         }
 
         public void Response(object result)
@@ -654,7 +731,7 @@ namespace LanguageServer2
 
     class Program
     {
-       // private static List<string> _requestLogs = new List<string>();
+        // private static List<string> _requestLogs = new List<string>();
         //private static readonly MethodResolver _methodResolver = new MethodResolver(new InitializeMethodHandler(), new ShutdownHandler(), new ExitHandler());
         static void Main(string[] args)
         {
