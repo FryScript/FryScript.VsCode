@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using FryScript;
+using FryScript.Compilation;
+using FryScript.Parsing;
+using FryScript.ScriptProviders;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -185,6 +189,7 @@ namespace LanguageServer2
 
     public class ProtocolMethods
     {
+        private ScriptEngine _se;
         private readonly Dictionary<string, IProtocol> _protocols = new Dictionary<string, IProtocol>();
 
         private class ProtocolMethodAttribute : Attribute
@@ -212,6 +217,10 @@ namespace LanguageServer2
 
         public virtual void Initialize(InitializeParams @params, Client<object> client)
         {
+            _se = new ScriptEngine(new ScriptCompiler(new ScriptParser()), ".fry", new List<IScriptProvider> {
+                new DirectoryScriptProvider(@params.RootPath)
+            });
+
             client.Response(new
             {
                 capabilities = new
@@ -231,33 +240,81 @@ namespace LanguageServer2
 
         public virtual void TextDocumentDidChange(DidChangeTextDocumentParams @params, Client<object> client)
         {
-            client.Response(null);
-            client.Diagnostics(new PublishDiagnosticsParams
+            var script = @params.ContentChanges.First().Text;
+
+            if (script != null)
             {
-                Uri = @params.TextDocument.Uri,
-                Diagnostics = new[]
+                try
                 {
+                    _se.Eval(script);
+                    client.Diagnostics(new PublishDiagnosticsParams
+                    {
+                        Uri = @params.TextDocument.Uri,
+                        Diagnostics = new Diagnostic[0]
+                    });
+                }
+                catch (ParserException ex)
+                {
+                    client.Diagnostics(new PublishDiagnosticsParams
+                    {
+                        Uri = @params.TextDocument.Uri,
+                        Diagnostics = new[]
+                   {
                     new Diagnostic
                     {
                         Severity = DiagnosticSeverity.Error,
                         Source = "Fry Script",
-                        Message = "This is an error dude!",
+                        Message = ex.Message,
                         Range = new Range
                         {
                             Start = new Position
                             {
-                                Line = 0,
-                                Character = 0
+                                Line = ex.Line ?? 0,
+                                Character = ex.Column ?? 0
                             },
                              End = new Position
                             {
-                                Line = 0,
-                                Character = 10
+                                Line = ex.Line ?? 0,
+                                Character = ex.Column + 1 ?? 0
                             },
                         }
                     }
                 }
-            });
+                    });
+                }
+                catch(CompilerException ex)
+                {
+                    client.Diagnostics(new PublishDiagnosticsParams
+                    {
+                        Uri = @params.TextDocument.Uri,
+                        Diagnostics = new[]
+                  {
+                    new Diagnostic
+                    {
+                        Severity = DiagnosticSeverity.Error,
+                        Source = "Fry Script",
+                        Message = ex.Message,
+                        Range = new Range
+                        {
+                            Start = new Position
+                            {
+                                Line = ex.Line ?? 0,
+                                Character = ex.Column ?? 0
+                            },
+                             End = new Position
+                            {
+                                Line = ex.Line ?? 0,
+                                Character = ex.Column + 1 ?? 0
+                            },
+                        }
+                    }
+                }
+                    });
+                }
+
+            }
+            client.Response(null);
+
 
         }
 
@@ -341,7 +398,7 @@ namespace LanguageServer2
 
     public class InitializeParams
     {
-
+        public string RootPath;
     }
 
     public class CompletionParams
