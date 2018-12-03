@@ -246,76 +246,48 @@ namespace LanguageServer2
             {
                 try
                 {
-                    _se.Eval(script);
+                    _se.Eval(@params.TextDocument.Uri, script);
                     client.Diagnostics(new PublishDiagnosticsParams
                     {
                         Uri = @params.TextDocument.Uri,
                         Diagnostics = new Diagnostic[0]
                     });
                 }
-                catch (ParserException ex)
+                catch (FryScriptException ex)
                 {
                     client.Diagnostics(new PublishDiagnosticsParams
                     {
                         Uri = @params.TextDocument.Uri,
                         Diagnostics = new[]
-                   {
-                    new Diagnostic
-                    {
-                        Severity = DiagnosticSeverity.Error,
-                        Source = "Fry Script",
-                        Message = ex.Message,
-                        Range = new Range
                         {
-                            Start = new Position
+                            new Diagnostic
                             {
-                                Line = ex.Line ?? 0,
-                                Character = ex.Column ?? 0
-                            },
-                             End = new Position
-                            {
-                                Line = ex.Line ?? 0,
-                                Character = ex.Column + 1 ?? 0
-                            },
+                                Severity = DiagnosticSeverity.Error,
+                                Source = "Fry Script",
+                                Message = ex.Message,
+                                Range = new Range
+                                {
+                                    Start = new Position
+                                    {
+                                        Line = ex.Line ?? 0,
+                                        Character = ex.Column ?? 0
+                                    },
+                                    End = new Position
+                                    {
+                                        Line = ex.Line ?? 0,
+                                        Character = ex.Column + 1 ?? 0
+                                    },
+                                }
+                            }
                         }
-                    }
-                }
                     });
                 }
-                catch(CompilerException ex)
+                catch(Exception ex)
                 {
-                    client.Diagnostics(new PublishDiagnosticsParams
-                    {
-                        Uri = @params.TextDocument.Uri,
-                        Diagnostics = new[]
-                  {
-                    new Diagnostic
-                    {
-                        Severity = DiagnosticSeverity.Error,
-                        Source = "Fry Script",
-                        Message = ex.Message,
-                        Range = new Range
-                        {
-                            Start = new Position
-                            {
-                                Line = ex.Line ?? 0,
-                                Character = ex.Column ?? 0
-                            },
-                             End = new Position
-                            {
-                                Line = ex.Line ?? 0,
-                                Character = ex.Column + 1 ?? 0
-                            },
-                        }
-                    }
+                    client.ShowMessage("Super fatal error!");
                 }
-                    });
-                }
-
+                client.Response(null);
             }
-            client.Response(null);
-
-
         }
 
         public virtual void Completion(CompletionParams @params, Client<CompletionItem[]> client)
