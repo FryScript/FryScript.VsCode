@@ -1,4 +1,5 @@
 ﻿using FryScript;
+using FryScript.Ast;
 using FryScript.Compilation;
 using FryScript.Parsing;
 using FryScript.ScriptProviders;
@@ -187,9 +188,122 @@ namespace LanguageServer2
         }
     }
 
+    public class ScriptAnalyser
+    {
+        private readonly ScriptEngine _scriptEngine;
+        private readonly IScriptCompiler _compiler;
+        private readonly Dictionary<string, HashSet<string>> _identifiers = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        public ScriptAnalyser(ScriptEngine scriptEngine)
+        {
+            _scriptEngine = scriptEngine;
+            _compiler = scriptEngine.Compiler;
+        }
+
+        public Diagnostic[] GetDiagnostics(string script, string fileName)
+        {
+            var context = new CompilerContext(_scriptEngine, fileName);
+            AstNode root;
+            Diagnostic[] diagnostics = new Diagnostic[0];
+            
+            try
+            {
+                root = _compiler.Parser.Parse(script, fileName, context);
+
+                FindIdentifiers(fileName, root);
+
+                _compiler.Compile(script, fileName, context);
+            }
+            catch(ParserException ex)
+            {
+                diagnostics = new[]
+                {
+                    new Diagnostic
+                    {
+                        Message = ex.Message,
+                        Severity = DiagnosticSeverity.Error,
+                        Source = "Fry Script",
+                        Range = new Range
+                        {
+                            Start = new Position
+                            {
+                                Line = ex.Line ?? 0,
+                                Character = ex.Column.HasValue ? ex.Column.Value : 0
+                            },
+                            End = new Position
+                            {
+                                Line = ex.Line ?? 0,
+                                Character = ex.Column.HasValue ? ex.Column.Value + 1: 0
+                            }
+                        }
+                    }
+                };
+            }
+            catch(CompilerException ex)
+            {
+                diagnostics = new[]
+                {
+                    new Diagnostic
+                    {
+                        Message = ex.Message,
+                        Severity = DiagnosticSeverity.Error,
+                        Source = "Fry Script",
+                        Range = new Range
+                        {
+                            Start = new Position
+                            {
+                                Line = ex.Line ?? 0,
+                                Character = ex.Column.HasValue ? ex.Column.Value : 0
+                            },
+                            End = new Position
+                            {
+                                Line = ex.Line ?? 0,
+                                Character = ex.Column.HasValue ? ex.Column.Value + 1: 0
+                            }
+                        }
+                    }
+                };
+            }
+            catch(Exception)
+            {
+                // Do something here!
+            }
+
+            return diagnostics;
+        }
+
+        public HashSet<string> GetIdentifiers(string fileName)
+        {
+            if (!_identifiers.ContainsKey(fileName))
+                return new HashSet<string>();
+
+            return _identifiers[fileName];
+        }
+
+        private void FindIdentifiers(string fileName, AstNode root)
+        {
+            _identifiers[fileName] = FindIdentifiersRecurse(root);
+        }
+
+        private HashSet<string> FindIdentifiersRecurse(AstNode root, HashSet<string> identifiers = null)
+        {
+            identifiers = identifiers ?? new HashSet<string>();
+
+            if (root is IdentifierNode identifierNode && !identifiers.Contains(identifierNode.ValueString))
+                identifiers.Add(root.ValueString);
+
+            foreach(var childNode in root?.ChildNodes ?? new AstNode[0])
+            {
+                FindIdentifiersRecurse(childNode, identifiers);
+            }
+
+            return identifiers;
+        }
+    }
+
     public class ProtocolMethods
     {
-        private ScriptEngine _se;
+        private ScriptAnalyser _analyser;
         private readonly Dictionary<string, IProtocol> _protocols = new Dictionary<string, IProtocol>();
 
         private class ProtocolMethodAttribute : Attribute
@@ -217,9 +331,10 @@ namespace LanguageServer2
 
         public virtual void Initialize(InitializeParams @params, Client<object> client)
         {
-            _se = new ScriptEngine(new ScriptCompiler(new ScriptParser()), ".fry", new List<IScriptProvider> {
+            _analyser = new ScriptAnalyser(new ScriptEngine(
+                new ScriptCompiler(new ScriptParser()), ".fry", new List<IScriptProvider> {
                 new DirectoryScriptProvider(@params.RootPath)
-            });
+            }));
 
             client.Response(new
             {
@@ -244,93 +359,36 @@ namespace LanguageServer2
 
             if (script != null)
             {
-                try
+                client.Diagnostics(new PublishDiagnosticsParams
                 {
-                    _se.Eval(script);
-                    client.Diagnostics(new PublishDiagnosticsParams
-                    {
-                        Uri = @params.TextDocument.Uri,
-                        Diagnostics = new Diagnostic[0]
-                    });
-                }
-                catch (ParserException ex)
-                {
-                    client.Diagnostics(new PublishDiagnosticsParams
-                    {
-                        Uri = @params.TextDocument.Uri,
-                        Diagnostics = new[]
-                   {
-                    new Diagnostic
-                    {
-                        Severity = DiagnosticSeverity.Error,
-                        Source = "Fry Script",
-                        Message = ex.Message,
-                        Range = new Range
-                        {
-                            Start = new Position
-                            {
-                                Line = ex.Line ?? 0,
-                                Character = ex.Column ?? 0
-                            },
-                             End = new Position
-                            {
-                                Line = ex.Line ?? 0,
-                                Character = ex.Column + 1 ?? 0
-                            },
-                        }
-                    }
-                }
-                    });
-                }
-                catch(CompilerException ex)
-                {
-                    client.Diagnostics(new PublishDiagnosticsParams
-                    {
-                        Uri = @params.TextDocument.Uri,
-                        Diagnostics = new[]
-                  {
-                    new Diagnostic
-                    {
-                        Severity = DiagnosticSeverity.Error,
-                        Source = "Fry Script",
-                        Message = ex.Message,
-                        Range = new Range
-                        {
-                            Start = new Position
-                            {
-                                Line = ex.Line ?? 0,
-                                Character = ex.Column ?? 0
-                            },
-                             End = new Position
-                            {
-                                Line = ex.Line ?? 0,
-                                Character = ex.Column + 1 ?? 0
-                            },
-                        }
-                    }
-                }
-                    });
-                }
+                    Uri = @params.TextDocument.Uri,
+                    Diagnostics = _analyser.GetDiagnostics(script, @params.TextDocument.Uri)
+                });
 
             }
+   
             client.Response(null);
-
-
         }
 
         public virtual void Completion(CompletionParams @params, Client<CompletionItem[]> client)
         {
-            client.Response(new[]
+            var completionItems = _analyser.GetIdentifiers(@params.TextDocument.Uri).Select(i => new CompletionItem
             {
-                new CompletionItem
-                {
-                    Label = "Mr"
-                },
-                new CompletionItem
-                {
-                    Label = "McGoo"
-                }
-            });
+                Label = i
+            }).ToArray();
+
+            client.Response(completionItems);
+            //client.Response(new[]
+            //{
+            //    new CompletionItem
+            //    {
+            //        Label = "Mr"
+            //    },
+            //    new CompletionItem
+            //    {
+            //        Label = "McGoo"
+            //    }
+            //});
         }
 
         public virtual void Initialize(ProtocolVoid @params, Client<ProtocolVoid> client)
@@ -404,6 +462,8 @@ namespace LanguageServer2
     public class CompletionParams
     {
         public CompletionContext context;
+
+        public TextDocumentIdentifier TextDocument;
     }
 
     public class CompletionContext
