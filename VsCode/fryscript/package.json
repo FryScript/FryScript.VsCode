@@ -5,7 +5,7 @@
     "version": "0.0.1",
     "publisher": "asd",
     "engines": {
-        "vscode": "^1.27.0"
+        "vscode": "^1.38.0"
     },
     "categories": [
         "Programming Languages"
@@ -41,14 +41,15 @@
         "compile": "tsc -p ./",
         "watch": "tsc -w -p ./",
         "update-vscode": "node ./node_modules/vscode/bin/install",
-        "postinstall": "node ./node_modules/vscode/bin/install"
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "build-language-server": "node out/.build/src/build"
     },
     "devDependencies": {
         "@types/node": "^10.12.10",
         "tslint": "^5.11.0",
         "typescript": "^3.1.6",
-        "vscode": "^1.1.22",
-        "vscode-languageclient": "^5.1.1"
+        "vscode": "^1.1.36",
+        "vscode-languageclient": "^5.2.1"
     },
     "dependencies": {
         "dotnet-2.1": "^2.1.0"

@@ -13,16 +13,19 @@ export function activate(context: ExtensionContext) {
 
 	// The server is implemented in node
 	
-	let serverModule = 'dotnet';
-	let arg = context.asAbsolutePath('bin/netcoreApp2.1/LanguageServer.dll')
+	//let serverModule = 'dotnet';
+	//let arg = context.asAbsolutePath('bin/netcoreApp2.1/LanguageServer.dll')
+	let runCommand = context.asAbsolutePath('bin/netcoreApp2.2/win-x64/LanguageServer.exe')
 	// The debug options for the server
 	let debugOptions = { execArgv: ["--nolazy", "--inspect=6009"] };
 	
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
-		run : { command: serverModule, args: [arg] },
-		debug: { command: serverModule, args: [arg], options:{detached: true} }
+		// run : { command: serverModule, args: [arg] },
+		run : { command: runCommand },
+		// debug: { command: serverModule, args: [arg], options:{detached: true} }
+		debug: { command: runCommand, options:{detached: true} }
 	}
 	
 	// Options to control the language client
