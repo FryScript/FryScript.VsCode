@@ -8,6 +8,7 @@ import * as path from 'path';
 
 import { workspace, ExtensionContext } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient';
+import { platform } from 'process';
 
 export function activate(context: ExtensionContext) {
 
@@ -21,9 +22,9 @@ export function activate(context: ExtensionContext) {
 
 	let binPath = undefined;
 
-	switch (process.platform) {
+	switch (platform) {
 		case "win32":
-			binPath = 'bin/netcreapp2.2/windows-x64/LanguageServer.exe';
+			binPath = 'bin/netcoreapp2.2/win10-x64/LanguageServer.exe';
 			break;
 		case "linux":
 			binPath = 'bin/netcoreapp2.2/linux-x64/LanguageServer';

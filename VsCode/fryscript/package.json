@@ -43,7 +43,8 @@
         "update-vscode": "node ./node_modules/vscode/bin/install",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "build-dotnet-linux-x64": "cd ../LanguageServer && dotnet publish -r linux-x64 -f netcoreapp2.2 -c Release",
-        "build-dotnet-windows-x64": "cd ../LanguageServer && dotnet publish -r windows-x64 -f netcoreapp2.2 -c Release"
+        "build-dotnet-windows-x64": "node out/.build/src/build.js",
+        "build-server": "node out/.build/src/build.js"
     },
     "devDependencies": {
         "@types/node": "^10.12.10",
