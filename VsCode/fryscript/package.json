@@ -1,9 +1,9 @@
 {
     "name": "fryscript",
     "displayName": "Fry Script",
-    "description": "Fry Script language support",
+    "description": "Fry Script Language Support",
     "version": "0.0.1",
-    "publisher": "asd",
+    "publisher": "Fry Script",
     "engines": {
         "vscode": "^1.38.0"
     },
@@ -42,7 +42,8 @@
         "watch": "tsc -w -p ./",
         "update-vscode": "node ./node_modules/vscode/bin/install",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "build-language-server": "node out/.build/src/build"
+        "build-dotnet-linux-x64": "cd ../LanguageServer && dotnet publish -r linux-x64 -f netcoreapp2.2 -c Release",
+        "build-dotnet-windows-x64": "cd ../LanguageServer && dotnet publish -r windows-x64 -f netcoreapp2.2 -c Release"
     },
     "devDependencies": {
         "@types/node": "^10.12.10",
@@ -50,8 +51,5 @@
         "typescript": "^3.1.6",
         "vscode": "^1.1.36",
         "vscode-languageclient": "^5.2.1"
-    },
-    "dependencies": {
-        "dotnet-2.1": "^2.1.0"
     }
 }
