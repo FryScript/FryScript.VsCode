@@ -44,6 +44,17 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
         }
 
         [TestMethod]
+        [ExpectedException(typeof(HeaderException))]
+        public async Task Read_Header_Non_Int_Content_Length_Exception()
+        {
+            _textReader
+                .ReadLineAsync()
+                .Returns(Task.FromResult<string>("Content-Length: error"));
+
+            await _headerReader.Read();
+        }
+
+        [TestMethod]
         public async Task Read_Header_Success()
         {
             _textReader

@@ -23,7 +23,10 @@ namespace FryScript.VsCode.LanguageServer.Protocol
             if (header.Length != 2)
                 throw new HeaderException($"Content-Length header was malformed: \"{contentLine}\"");
 
-            return int.Parse(header[1]);
+            if (!int.TryParse(header[1], out int length))
+                throw new HeaderException($"Content-Length is not a number: \"{header[1]}\"");
+
+            return length;
         }
     }
 }
