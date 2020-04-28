@@ -27,10 +27,4 @@
     <ProjectReference Include="..\FryScript.VsCode.LanguageServer\FryScript.VsCode.LanguageServer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="FryScript">
-      <HintPath>..\..\..\FryScript\FryScript\FryScript\bin\Debug\netstandard2.0\FryScript.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
