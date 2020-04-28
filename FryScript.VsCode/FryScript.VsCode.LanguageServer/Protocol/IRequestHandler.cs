@@ -3,8 +3,8 @@ using FryScript.VsCode.LanguageServer.Protocol.Schema;
 
 namespace FryScript.VsCode.LanguageServer.Protocol
 {
-    public interface IRequestReader
+    public interface IRequestHandler
     {
-        Task<RequestMessage> Read();
+        Task Handle();
     }
 }
