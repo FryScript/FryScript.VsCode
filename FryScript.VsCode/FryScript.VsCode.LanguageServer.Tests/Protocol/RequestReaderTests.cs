@@ -1,16 +1,19 @@
 ﻿using FryScript.VsCode.LanguageServer.Protocol;
 using FryScript.VsCode.LanguageServer.Protocol.Exceptions;
+using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using NSubstitute;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace FryScript.VsCode.LanguageServer.Tests.Protocol
 {
     [TestClass]
-    public class HeaderReaderTests
+    public class RequestReaderTests
     {
-        private HeaderReader _headerReader;
+        private RequestReader _headerReader;
         private TextReader _textReader;
 
         [TestInitialize]
@@ -18,7 +21,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
         {
             _textReader = Substitute.For<TextReader>();
 
-            _headerReader = new HeaderReader(_textReader);
+            _headerReader = new RequestReader(_textReader);
         }
 
         [TestMethod]
@@ -57,15 +60,34 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
         [TestMethod]
         public async Task Read_Header_Success()
         {
+            var expectedRequest = new RequestMessage
+            {
+                Id = 100,
+                Method = "test",
+                Params = "params"
+            };
+
+            var requestJson = JsonConvert.SerializeObject(expectedRequest);
+
             _textReader
                 .ReadLineAsync()
-                .Returns(Task.FromResult<string>("Content-Length: 100\r\n"));
+                .Returns(
+                    x => Task.FromResult<string>($"Content-Length: {requestJson.Length}\r\n"),
+                    x => Task.FromResult(string.Empty));
+
+            _textReader
+                .ReadAsync(Arg.Do<char[]>(c =>
+                {
+                    var chars = requestJson.ToCharArray();
+                    Array.Copy(chars, 0, c, 0, chars.Length);
+                }), 0, requestJson.Length)
+                .Returns(Task.FromResult(requestJson.Length));
 
             var result = await _headerReader.Read();
 
-            Assert.AreEqual(100, result);
-
-            await _textReader.Received(2).ReadLineAsync();
+            Assert.AreEqual(expectedRequest.Id, result.Id);
+            Assert.AreEqual(expectedRequest.Method, result.Method);
+            Assert.AreEqual(expectedRequest.Params, result.Params);
         }
     }
 }

@@ -7,18 +7,18 @@ namespace FryScript.VsCode.LanguageServer.Protocol
 {
     public class RequestHandler : IRequestHandler
     {
-        private readonly IHeaderReader _headerReader;
-        private readonly IContentReader _contentReader;
+        private readonly IRequestReader _requestReader;
         private readonly IProtocolMethods _protocolMethods;
-        private readonly TextWriter _textWriter;
+        private readonly IResponseWriter _responseWriter;
 
-        public RequestHandler(IHeaderReader headerReader, IContentReader contentReader, IProtocolMethods protocolMethods, TextWriter textWriter)
-            => (_headerReader, _contentReader, _protocolMethods, _textWriter) = (headerReader, contentReader, protocolMethods, textWriter);
+        public RequestHandler(IRequestReader requestReader, IProtocolMethods protocolMethods, IResponseWriter responseWriter)
+            => (_requestReader, _protocolMethods, _responseWriter) = (requestReader, protocolMethods, responseWriter);
 
         public async Task Handle()
         {
-            var contentLength = await _headerReader.Read();
-            var content = await _contentReader.Read(contentLength);
+            var requestMessage = await _requestReader.Read();
+            var responseMessage = await _protocolMethods.Execute(requestMessage);
+            await _responseWriter.Write(responseMessage);
         }
     }
 }

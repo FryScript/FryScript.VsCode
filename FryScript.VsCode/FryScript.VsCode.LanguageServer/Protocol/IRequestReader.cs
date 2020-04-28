@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace FryScript.VsCode.LanguageServer.Protocol
 {
-    public interface IProtocolMethods
+    public interface IRequestReader
     {
-        Task<ResponseMessage> Execute(RequestMessage requestMessage);
+        Task<RequestMessage> Read();
     }
 }

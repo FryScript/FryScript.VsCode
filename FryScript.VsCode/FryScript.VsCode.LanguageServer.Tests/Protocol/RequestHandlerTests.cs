@@ -1,4 +1,5 @@
 using FryScript.VsCode.LanguageServer.Protocol;
+using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using System.IO;
@@ -10,32 +11,31 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
     public class RequestHandlerTests
     {
         private RequestHandler _requestHandler;
-        private IHeaderReader _headerReader;
-        private IContentReader _contentReader;
+        private IRequestReader _requestReader;
         private IProtocolMethods _protocolMethods;
-        private TextWriter _textWriter;
+        private IResponseWriter _responseWriter;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _headerReader = Substitute.For<IHeaderReader>();
-            _contentReader = Substitute.For<IContentReader>();
+            _requestReader = Substitute.For<IRequestReader>();
             _protocolMethods = Substitute.For<IProtocolMethods>();
-            _textWriter = Substitute.For<TextWriter>();
-            _requestHandler = new RequestHandler(_headerReader, _contentReader, _protocolMethods, _textWriter);
+            _responseWriter = Substitute.For<IResponseWriter>();
+            _requestHandler = new RequestHandler(_requestReader, _protocolMethods, _responseWriter);
         }
 
         [TestMethod]
         public async Task Handle_Success()
         {
-            var expectedRequestJson = "json-request";
-            var expectedResponseJson = "json-response";
+            var requestMessage = new RequestMessage();
+            var expectedResponse = new ResponseMessage();
 
-            _headerReader.Read().Returns(Task.FromResult(expectedRequestJson.Length));
-            _contentReader.Read(expectedRequestJson.Length).Returns(Task.FromResult(expectedRequestJson));
-            _protocolMethods.Execute(expectedRequestJson).Returns(expectedResponseJson);
+            _requestReader.Read().Returns(Task.FromResult(requestMessage));
+            _protocolMethods.Execute(requestMessage).Returns(Task.FromResult(expectedResponse));
 
-            await _textWriter.Received().WriteAsync(expectedResponseJson);
+            await _requestHandler.Handle();
+
+            await _responseWriter.Received().Write(expectedResponse);
         }
     }
 }
