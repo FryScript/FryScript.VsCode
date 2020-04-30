@@ -56,5 +56,18 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
             Assert.IsInstanceOfType(response.Result, typeof(TestResponse));
             Assert.AreEqual(100, response.Id);
         }
+
+        [TestMethod]
+        public async Task Execute_Unhandled_Request()
+        {
+            var requestMessage = new RequestMessage
+            {
+                Method = "method/unregistered",
+            };
+
+            var response = await _testProtocolMethods.Execute(requestMessage);
+
+            Assert.IsNull(response.Result);
+        }
     }
 }

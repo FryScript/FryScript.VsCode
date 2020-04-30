@@ -23,13 +23,15 @@ namespace FryScript.VsCode.LanguageServer.Protocol
             public override object? Invoke(object? request) => _invoker((TRequest)request!);
         }
 
+        private static readonly MethodInvoker MissingMethodInvoker = new MethodInvoker<object, object?>(o => null);
+
         private readonly Dictionary<string, MethodInvoker> _methodInvokers = new Dictionary<string, MethodInvoker>();
 
         public Task<ResponseMessage> Execute(RequestMessage requestMessage)
         {
             var methodInvoker = GetMethodInvoker(requestMessage.Method);
 
-            return Task.Run(() =>new ResponseMessage
+            return Task.Run(() => new ResponseMessage
             {
                 Id = requestMessage.Id,
                 Result = methodInvoker?.Invoke(requestMessage?.Params)
@@ -38,17 +40,18 @@ namespace FryScript.VsCode.LanguageServer.Protocol
 
         private MethodInvoker GetMethodInvoker(string method)
         {
-            if (!_methodInvokers.TryGetValue(method, out MethodInvoker? methodInvoker))
+            if (_methodInvokers.TryGetValue(method, out MethodInvoker? methodInvoker))
+                return methodInvoker;
+
+            var methodInfo = (from m in GetType().GetTypeInfo().DeclaredMethods
+                           from a in m.GetCustomAttributes()
+                           let pa = a as ProtocolMethodAttribute
+                           where pa != null
+                           && string.Compare(method, pa.Method, true) == 0
+                           select m).SingleOrDefault();
+
+            if (methodInfo != null)
             {
-                var results = (from m in GetType().GetTypeInfo().DeclaredMethods
-                               from a in m.GetCustomAttributes()
-                               let pa = a as ProtocolMethodAttribute
-                               where pa != null
-                               && string.Compare(method, pa.Method, true) == 0
-                               select new { m, pa }).Single();
-
-                var methodInfo = results.m;
-
                 var paramType = methodInfo.GetParameters().First().ParameterType;
                 var delegateType = typeof(Func<,>)
                     .MakeGenericType(paramType,
@@ -60,9 +63,13 @@ namespace FryScript.VsCode.LanguageServer.Protocol
                     .MakeGenericType(paramType, methodInfo.ReturnType);
 
                 methodInvoker = (MethodInvoker)Activator.CreateInstance(methodInvokerType, del)!;
-
-                _methodInvokers.Add(results.pa.Method, methodInvoker);
             }
+            else
+            {
+                methodInvoker = MissingMethodInvoker;
+            }
+
+            _methodInvokers.Add(method, methodInvoker);
 
             return methodInvoker;
         }
