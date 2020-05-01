@@ -1,7 +1,9 @@
-﻿namespace FryScript.VsCode.LanguageServer
+﻿using System.Threading;
+
+namespace FryScript.VsCode.LanguageServer
 {
     public interface IServer
     {
-        void Start();
+        CancellationToken Start();
     }
 }
