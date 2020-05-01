@@ -1,6 +1,6 @@
 using Newtonsoft.Json.Linq;
 
-namespace FryScript.VsCode.LanguageServer.Protocol.Schema
+namespace FryScript.VsCode.LanguageServer.Protocol
 {
     public class RequestMessage : Message
     {

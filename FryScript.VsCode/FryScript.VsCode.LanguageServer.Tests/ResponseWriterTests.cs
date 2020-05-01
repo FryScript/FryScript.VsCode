@@ -1,12 +1,11 @@
 using System.IO;
 using System.Threading.Tasks;
 using FryScript.VsCode.LanguageServer.Protocol;
-using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NSubstitute;
 
-namespace FryScript.VsCode.LanguageServer.Tests.Protocol
+namespace FryScript.VsCode.LanguageServer.Tests
 {
     [TestClass]
     public class ResponseWriterTests

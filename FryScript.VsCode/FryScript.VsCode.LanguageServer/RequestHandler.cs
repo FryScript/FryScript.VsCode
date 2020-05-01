@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using FryScript.VsCode.LanguageServer.Protocol.Schema;
+﻿using System.Threading.Tasks;
 
-namespace FryScript.VsCode.LanguageServer.Protocol
+namespace FryScript.VsCode.LanguageServer
 {
     public class RequestHandler : IRequestHandler
     {

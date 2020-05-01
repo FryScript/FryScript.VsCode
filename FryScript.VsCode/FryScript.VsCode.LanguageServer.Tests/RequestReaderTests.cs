@@ -1,6 +1,4 @@
 ﻿using FryScript.VsCode.LanguageServer.Protocol;
-using FryScript.VsCode.LanguageServer.Protocol.Exceptions;
-using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,7 +7,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace FryScript.VsCode.LanguageServer.Tests.Protocol
+namespace FryScript.VsCode.LanguageServer.Tests
 {
     [TestClass]
     public class RequestReaderTests
@@ -26,7 +24,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HeaderException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public async Task Read_Header_Null_Content_Length_Header_Exception()
         {
             _textReader
@@ -37,23 +35,23 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HeaderException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public async Task Read_Header_Malformed_Content_Length_Exception()
         {
             _textReader
                 .ReadLineAsync()
-                .Returns(Task.FromResult<string>("Content-Length 100"));
+                .Returns(Task.FromResult("Content-Length 100"));
 
             await _headerReader.Read();
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HeaderException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public async Task Read_Header_Non_Int_Content_Length_Exception()
         {
             _textReader
                 .ReadLineAsync()
-                .Returns(Task.FromResult<string>("Content-Length: error"));
+                .Returns(Task.FromResult("Content-Length: error"));
 
             await _headerReader.Read();
         }
@@ -73,7 +71,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
             _textReader
                 .ReadLineAsync()
                 .Returns(
-                    x => Task.FromResult<string>($"Content-Length: {requestJson.Length}\r\n"),
+                    x => Task.FromResult($"Content-Length: {requestJson.Length}\r\n"),
                     x => Task.FromResult(string.Empty));
 
             _textReader

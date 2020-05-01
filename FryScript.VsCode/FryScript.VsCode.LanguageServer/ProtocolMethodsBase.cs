@@ -1,4 +1,4 @@
-﻿using FryScript.VsCode.LanguageServer.Protocol.Schema;
+﻿using FryScript.VsCode.LanguageServer.Protocol;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace FryScript.VsCode.LanguageServer.Protocol
+namespace FryScript.VsCode.LanguageServer
 {
     public abstract class ProtocolMethodsBase : IProtocolMethods
     {
@@ -19,9 +19,9 @@ namespace FryScript.VsCode.LanguageServer.Protocol
         {
             private readonly Func<TRequest, TResponse> _invoker;
 
-            public MethodInvoker(Func<TRequest, TResponse> invoker) => (_invoker) = (invoker);
+            public MethodInvoker(Func<TRequest, TResponse> invoker) => _invoker = invoker;
 
-            public override object? Invoke(JObject? request) => _invoker((request != null ? request.ToObject<TRequest>() : default(TRequest))!);
+            public override object? Invoke(JObject? request) => _invoker((request != null ? request.ToObject<TRequest>() : default)!);
         }
 
         private static MethodInfo MissingMethodInfo = typeof(ProtocolMethodsBase).GetTypeInfo().GetMethod(nameof(MissingMethod), BindingFlags.NonPublic | BindingFlags.Instance)!;

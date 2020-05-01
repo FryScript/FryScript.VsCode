@@ -1,11 +1,9 @@
 ﻿using FryScript.VsCode.LanguageServer.Protocol;
-using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
-namespace FryScript.VsCode.LanguageServer.Tests.Protocol
+namespace FryScript.VsCode.LanguageServer.Tests
 {
     [TestClass]
     public class ProtocolMethodsBaseTests
@@ -43,7 +41,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
         [TestMethod]
         public async Task Execute_Success()
         {
-            
+
             var requestMessage = new RequestMessage
             {
                 Method = "method/test",

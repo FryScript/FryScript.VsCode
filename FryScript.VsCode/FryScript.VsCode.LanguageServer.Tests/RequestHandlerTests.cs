@@ -1,11 +1,9 @@
 using FryScript.VsCode.LanguageServer.Protocol;
-using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System.IO;
 using System.Threading.Tasks;
 
-namespace FryScript.VsCode.LanguageServer.Tests.Protocol
+namespace FryScript.VsCode.LanguageServer.Tests
 {
     [TestClass]
     public class RequestHandlerTests

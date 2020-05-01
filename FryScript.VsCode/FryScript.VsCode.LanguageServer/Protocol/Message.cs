@@ -1,6 +1,6 @@
 using FryScript.VsCode.LanguageServer.Protocol.Constants;
 
-namespace FryScript.VsCode.LanguageServer.Protocol.Schema
+namespace FryScript.VsCode.LanguageServer.Protocol
 {
     public abstract class Message
     {

@@ -1,7 +1,7 @@
-﻿using FryScript.VsCode.LanguageServer.Protocol.Schema;
+﻿using FryScript.VsCode.LanguageServer.Protocol;
 using System.Threading.Tasks;
 
-namespace FryScript.VsCode.LanguageServer.Protocol
+namespace FryScript.VsCode.LanguageServer
 {
     public interface IRequestReader
     {

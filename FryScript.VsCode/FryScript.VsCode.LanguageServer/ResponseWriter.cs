@@ -1,19 +1,18 @@
 using System.IO;
 using System.Threading.Tasks;
-using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Newtonsoft.Json;
 
-namespace  FryScript.VsCode.LanguageServer.Protocol
+namespace FryScript.VsCode.LanguageServer
 {
     public class ResponseWriter : IResponseWriter
     {
         private readonly TextWriter _textWriter;
 
-        public ResponseWriter(TextWriter textWriter) => (_textWriter) = (textWriter);
+        public ResponseWriter(TextWriter textWriter) => _textWriter = textWriter;
 
         public async Task Write(object? response)
         {
-            if(response == null)
+            if (response == null)
                 return;
 
             var content = JsonConvert.SerializeObject(response);
