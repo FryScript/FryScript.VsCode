@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+
 namespace FryScript.VsCode.LanguageServer.Protocol.Schema
 {
     public class RequestMessage : Message
@@ -6,6 +8,6 @@ namespace FryScript.VsCode.LanguageServer.Protocol.Schema
 
         public string Method {get;set;} = string.Empty;
 
-        public object? Params {get;set;}
+        public JObject? Params {get;set;}
     }
 }

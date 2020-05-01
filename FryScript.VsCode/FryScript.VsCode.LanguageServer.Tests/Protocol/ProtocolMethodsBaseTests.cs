@@ -1,6 +1,8 @@
 ﻿using FryScript.VsCode.LanguageServer.Protocol;
 using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
 namespace FryScript.VsCode.LanguageServer.Tests.Protocol
@@ -44,10 +46,10 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
             var requestMessage = new RequestMessage
             {
                 Method = "method/test",
-                Params = new TestRequest
+                Params = new JObject (new TestRequest
                 {
                     Data = "test data"
-                },
+                }),
                 Id = 100
             };
 

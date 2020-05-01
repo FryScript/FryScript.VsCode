@@ -23,7 +23,7 @@ namespace FryScript.VsCode.LanguageServer.Protocol
             public override object? Invoke(object? request) => _invoker((TRequest)request!);
         }
 
-        private static readonly MethodInvoker MissingMethodInvoker = new MethodInvoker<object, object?>(o => null);
+        private static MethodInfo MissingMethodInfo = typeof(ProtocolMethodsBase).GetTypeInfo().GetMethod(nameof(MissingMethod), BindingFlags.NonPublic | BindingFlags.Instance)!;
 
         private readonly Dictionary<string, MethodInvoker> _methodInvokers = new Dictionary<string, MethodInvoker>();
 
@@ -44,34 +44,32 @@ namespace FryScript.VsCode.LanguageServer.Protocol
                 return methodInvoker;
 
             var methodInfo = (from m in GetType().GetTypeInfo().DeclaredMethods
-                           from a in m.GetCustomAttributes()
-                           let pa = a as ProtocolMethodAttribute
-                           where pa != null
-                           && string.Compare(method, pa.Method, true) == 0
-                           select m).SingleOrDefault();
+                              from a in m.GetCustomAttributes()
+                              let pa = a as ProtocolMethodAttribute
+                              where pa != null
+                              && string.Compare(method, pa.Method, true) == 0
+                              select m).SingleOrDefault() ?? MissingMethodInfo;
 
-            if (methodInfo != null)
-            {
-                var paramType = methodInfo.GetParameters().First().ParameterType;
-                var delegateType = typeof(Func<,>)
-                    .MakeGenericType(paramType,
-                    methodInfo.ReturnType);
+            var paramType = methodInfo.GetParameters().First().ParameterType;
+            var delegateType = typeof(Func<,>)
+                .MakeGenericType(paramType,
+                methodInfo.ReturnType);
 
-                var del = methodInfo.CreateDelegate(delegateType, this);
+            var del = methodInfo.CreateDelegate(delegateType, this);
 
-                var methodInvokerType = typeof(MethodInvoker<,>)
-                    .MakeGenericType(paramType, methodInfo.ReturnType);
+            var methodInvokerType = typeof(MethodInvoker<,>)
+                .MakeGenericType(paramType, methodInfo.ReturnType);
 
-                methodInvoker = (MethodInvoker)Activator.CreateInstance(methodInvokerType, del)!;
-            }
-            else
-            {
-                methodInvoker = MissingMethodInvoker;
-            }
+            methodInvoker = (MethodInvoker)Activator.CreateInstance(methodInvokerType, del)!;
 
             _methodInvokers.Add(method, methodInvoker);
 
             return methodInvoker;
+        }
+
+        private object? MissingMethod(object val)
+        {
+            return null;
         }
     }
 }

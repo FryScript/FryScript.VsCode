@@ -3,6 +3,7 @@ using FryScript.VsCode.LanguageServer.Protocol.Exceptions;
 using FryScript.VsCode.LanguageServer.Protocol.Schema;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NSubstitute;
 using System;
 using System.IO;
@@ -64,7 +65,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
             {
                 Id = 100,
                 Method = "test",
-                Params = "params"
+                Params = new JObject()
             };
 
             var requestJson = JsonConvert.SerializeObject(expectedRequest);
@@ -87,7 +88,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
 
             Assert.AreEqual(expectedRequest.Id, result.Id);
             Assert.AreEqual(expectedRequest.Method, result.Method);
-            Assert.AreEqual(expectedRequest.Params, result.Params);
+            Assert.IsInstanceOfType(result.Params, typeof(JObject));
         }
     }
 }
