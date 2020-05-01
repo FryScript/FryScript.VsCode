@@ -1,4 +1,5 @@
 ﻿using FryScript.VsCode.LanguageServer.Protocol.Schema;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace FryScript.VsCode.LanguageServer.Protocol
     {
         private abstract class MethodInvoker
         {
-            public abstract object? Invoke(object? request);
+            public abstract object? Invoke(JObject? request);
         }
 
         private class MethodInvoker<TRequest, TResponse> : MethodInvoker
@@ -20,7 +21,7 @@ namespace FryScript.VsCode.LanguageServer.Protocol
 
             public MethodInvoker(Func<TRequest, TResponse> invoker) => (_invoker) = (invoker);
 
-            public override object? Invoke(object? request) => _invoker((TRequest)request!);
+            public override object? Invoke(JObject? request) => _invoker((request != null ? request.ToObject<TRequest>() : default(TRequest))!);
         }
 
         private static MethodInfo MissingMethodInfo = typeof(ProtocolMethodsBase).GetTypeInfo().GetMethod(nameof(MissingMethod), BindingFlags.NonPublic | BindingFlags.Instance)!;

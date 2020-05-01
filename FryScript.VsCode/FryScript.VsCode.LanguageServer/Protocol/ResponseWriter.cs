@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using FryScript.VsCode.LanguageServer.Protocol.Schema;
+using Newtonsoft.Json;
 
 namespace  FryScript.VsCode.LanguageServer.Protocol
 {
@@ -10,9 +11,16 @@ namespace  FryScript.VsCode.LanguageServer.Protocol
 
         public ResponseWriter(TextWriter textWriter) => (_textWriter) = (textWriter);
 
-        public Task Write(ResponseMessage responseMessage)
+        public async Task Write(object? response)
         {
-            throw new System.NotImplementedException();
+            if(response == null)
+                return;
+
+            var content = JsonConvert.SerializeObject(response);
+
+            await _textWriter.WriteLineAsync($"Content-Length: {content.Length}");
+            await _textWriter.WriteLineAsync();
+            await _textWriter.WriteAsync(content);
         }
     }
 }

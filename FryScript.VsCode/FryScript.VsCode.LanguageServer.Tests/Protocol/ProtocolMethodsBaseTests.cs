@@ -43,10 +43,11 @@ namespace FryScript.VsCode.LanguageServer.Tests.Protocol
         [TestMethod]
         public async Task Execute_Success()
         {
+            
             var requestMessage = new RequestMessage
             {
                 Method = "method/test",
-                Params = new JObject (new TestRequest
+                Params = JObject.FromObject(new TestRequest
                 {
                     Data = "test data"
                 }),
