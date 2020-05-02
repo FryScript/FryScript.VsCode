@@ -9,7 +9,18 @@ namespace FryScript.VsCode.LanguageServer
         private readonly IResponseWriter _responseWriter;
 
         public RequestHandler(IRequestReader requestReader, IProtocolMethods protocolMethods, IResponseWriter responseWriter)
-            => (_requestReader, _protocolMethods, _responseWriter) = (requestReader, protocolMethods, responseWriter);
+        {
+            _requestReader = requestReader;
+            _protocolMethods = protocolMethods;
+            _responseWriter = responseWriter;
+
+            _protocolMethods.OnSendClient += _protocolMethods_OnNotification;
+        }
+
+        private void _protocolMethods_OnNotification(object obj)
+        {
+            _responseWriter.Write(obj);
+        }
 
         public async Task Handle()
         {

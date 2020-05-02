@@ -24,9 +24,11 @@ namespace FryScript.VsCode.LanguageServer
             public override object? Invoke(JObject? request) => _invoker((request != null ? request.ToObject<TRequest>() : default)!);
         }
 
-        private static MethodInfo MissingMethodInfo = typeof(ProtocolMethodsBase).GetTypeInfo().GetMethod(nameof(MissingMethod), BindingFlags.NonPublic | BindingFlags.Instance)!;
+        private static readonly MethodInfo MissingMethodInfo = typeof(ProtocolMethodsBase).GetTypeInfo().GetMethod(nameof(MissingMethod), BindingFlags.NonPublic | BindingFlags.Instance)!;
 
         private readonly Dictionary<string, MethodInvoker> _methodInvokers = new Dictionary<string, MethodInvoker>();
+
+        public event Action<object>? OnSendClient;
 
         public Task<ResponseMessage> Execute(RequestMessage requestMessage)
         {
@@ -39,14 +41,18 @@ namespace FryScript.VsCode.LanguageServer
             });
         }
 
+        protected void SendClient(object val)
+        {
+            OnSendClient?.Invoke(val);
+        }
+
         private MethodInvoker GetMethodInvoker(string method)
         {
             if (_methodInvokers.TryGetValue(method, out MethodInvoker? methodInvoker))
                 return methodInvoker;
 
             var methodInfo = (from m in GetType().GetTypeInfo().DeclaredMethods
-                              from a in m.GetCustomAttributes()
-                              let pa = a as ProtocolMethodAttribute
+                              let pa = m.GetCustomAttribute<ProtocolMethodAttribute>()
                               where pa != null
                               && string.Compare(method, pa.Method, true) == 0
                               select m).SingleOrDefault() ?? MissingMethodInfo;

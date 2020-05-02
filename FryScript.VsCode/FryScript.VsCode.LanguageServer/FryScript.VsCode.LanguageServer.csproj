@@ -10,6 +10,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
+    <OutputPath>..\FryScript.VsCode.Plugin\bin</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

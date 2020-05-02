@@ -24,10 +24,10 @@ export function activate(context: ExtensionContext) {
 
 	switch (platform) {
 		case "win32":
-			binPath = 'bin/netcoreapp2.2/win10-x64/LanguageServer.exe';
+			binPath = 'bin/netcoreapp3.1/win10-x64/FryScript.VsCode.LanguageServer.exe';
 			break;
 		case "linux":
-			binPath = 'bin/netcoreapp2.2/linux-x64/LanguageServer';
+			binPath = 'bin/netcoreapp3.1/linux-x64/FryScript.VsCode.LanguageServer';
 			break;
 		default:
 			throw new Error(`Failed to launch language server. Unsupported platform "${process.platform}"`);
