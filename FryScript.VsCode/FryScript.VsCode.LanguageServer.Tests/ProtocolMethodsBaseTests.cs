@@ -1,6 +1,7 @@
 ﻿using FryScript.VsCode.LanguageServer.Protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Threading.Tasks;
 
 namespace FryScript.VsCode.LanguageServer.Tests
@@ -27,6 +28,17 @@ namespace FryScript.VsCode.LanguageServer.Tests
                 {
                     Data = request.Data
                 };
+            }
+
+            [ProtocolMethod("method/missingParameter")]
+            public TestResponse MissingParameter()
+            {
+                return new TestResponse();
+            }
+
+            [ProtocolMethod("method/voidReturn")]
+            public void VoidReturn(object val)
+            {
             }
         }
 
@@ -69,6 +81,26 @@ namespace FryScript.VsCode.LanguageServer.Tests
             var response = await _testProtocolMethods.Execute(requestMessage);
 
             Assert.IsNull(response.Result);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task Execute_Method_With_No_Parameters()
+        {
+            await _testProtocolMethods.Execute(new RequestMessage
+            {
+                Method = "method/missingParameter"
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task Execute_Method_Void_Return()
+        {
+            await _testProtocolMethods.Execute(new RequestMessage
+            {
+                Method = "method/voidReturn"
+            });
         }
     }
 }

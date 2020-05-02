@@ -57,7 +57,14 @@ namespace FryScript.VsCode.LanguageServer
                               && string.Compare(method, pa.Method, true) == 0
                               select m).SingleOrDefault() ?? MissingMethodInfo;
 
-            var paramType = methodInfo.GetParameters().First().ParameterType;
+            var paramType = methodInfo.GetParameters().SingleOrDefault()?.ParameterType;
+
+            if (paramType == null)
+                throw new InvalidOperationException($"Protocol method \"{methodInfo.Name}\" must accept exactly one parameter");
+
+            if (methodInfo.ReturnType == typeof(void))
+                throw new InvalidOperationException($"Protocol method \"{methodInfo.Name} cannot be void\"");
+
             var delegateType = typeof(Func<,>)
                 .MakeGenericType(paramType,
                 methodInfo.ReturnType);
