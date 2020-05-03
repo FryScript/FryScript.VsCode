@@ -8,6 +8,6 @@ namespace FryScript.VsCode.LanguageServer
     {
         Task<ResponseMessage> Execute(RequestMessage requestMessage);
 
-        event Action<object> OnSendClient;
+        event Action<object> OnClientRequest;
     }
 }

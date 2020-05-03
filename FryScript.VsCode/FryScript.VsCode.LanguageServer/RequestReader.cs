@@ -33,7 +33,11 @@ namespace FryScript.VsCode.LanguageServer
 
             var readLength = await _textReader.ReadAsync(_buffer, 0, contentLength);
 
-            return JsonConvert.DeserializeObject<RequestMessage>(new string(_buffer));
+            var content = new string(_buffer, 0, readLength);
+
+            var contentJson = JsonConvert.DeserializeObject<RequestMessage>(content);
+
+            return contentJson;
         }
     }
 }

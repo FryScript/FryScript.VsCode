@@ -8,52 +8,24 @@ namespace FryScript.VsCode.LanguageServer
     public class LSPMethods : ProtocolMethodsBase
     {
         [ProtocolMethod("initialize")]
-        public object Initialize(object @params)
+        public InitializeResult Initialize(InitializeParams @params)
         {
-            SendClient(new
+            return new InitializeResult(new ServerCapabilities
             {
-                method = "window/showMessage",
-                @params = new
+                CompletionProvider = new CompletionOptions
                 {
-                    type = 3,
-                    message = "Initialize received 1"
+                    TriggerCharacters = new[] {"."},
                 }
-            });
-
-            SendClient(new
+            })
             {
-                method = "window/showMessage",
-                @params = new
-                {
-                    type = 3,
-                    message = "Initialize received 2"
-                }
-            });
-
-            SendClient(new
-            {
-                method = "window/showMessage",
-                @params = new
-                {
-                    type = 3,
-                    message = "Initialize received 3"
-                }
-            });
-            return new
-            {
-                capabilities = new { },
-                serverInfo = new
-                {
-                    name = "Server test",
-                    version = "0.0.1"
-                }
+                ServerInfo = new ServerInfo("Test language server"),
             };
         }
 
         [ProtocolMethod("initialized")]
         public object? Initialized(object @params)
         {
-            SendClient(new
+            ClientRequest(new
             {
                 method = "window/showMessage",
                 @params = new
@@ -64,12 +36,30 @@ namespace FryScript.VsCode.LanguageServer
             });
             return null;
         }
+
+        [ProtocolMethod("textDocument/completion")]
+        public object? TextDocumentCompletion(CompletionParams @params)
+        {
+            ClientRequest(new
+            {
+                method = "window/showMessage",
+                @params = new
+                {
+                    type = 3,
+                    message = "Text document completion reponse"
+                }
+            });
+
+            return new object();
+        }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
+            //while (!Debugger.IsAttached) { }
+
             var server = Server.Build(new LSPMethods());
 
             server.Start();

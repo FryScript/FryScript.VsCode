@@ -1,5 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
+using FryScript.VsCode.LanguageServer.Protocol.Constants;
 using Newtonsoft.Json;
 
 namespace FryScript.VsCode.LanguageServer
@@ -15,7 +16,7 @@ namespace FryScript.VsCode.LanguageServer
             if (response == null)
                 return;
 
-            var content = JsonConvert.SerializeObject(response);
+            var content = JsonConvert.SerializeObject(response, JsonOptions.CamelCase);
 
             await _textWriter.WriteLineAsync($"Content-Length: {content.Length}");
             await _textWriter.WriteLineAsync();

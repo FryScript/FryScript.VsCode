@@ -12,7 +12,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
     [TestClass]
     public class RequestReaderTests
     {
-        private RequestReader _headerReader;
+        private RequestReader _requestReader;
         private TextReader _textReader;
 
         [TestInitialize]
@@ -20,7 +20,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
         {
             _textReader = Substitute.For<TextReader>();
 
-            _headerReader = new RequestReader(_textReader);
+            _requestReader = new RequestReader(_textReader);
         }
 
         [TestMethod]
@@ -31,7 +31,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
                 .ReadLineAsync()
                 .Returns(Task.FromResult<string>(null));
 
-            await _headerReader.Read();
+            await _requestReader.Read();
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
                 .ReadLineAsync()
                 .Returns(Task.FromResult("Content-Length 100"));
 
-            await _headerReader.Read();
+            await _requestReader.Read();
         }
 
         [TestMethod]
@@ -53,7 +53,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
                 .ReadLineAsync()
                 .Returns(Task.FromResult("Content-Length: error"));
 
-            await _headerReader.Read();
+            await _requestReader.Read();
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
                 }), 0, requestJson.Length)
                 .Returns(Task.FromResult(requestJson.Length));
 
-            var result = await _headerReader.Read();
+            var result = await _requestReader.Read();
 
             Assert.AreEqual(expectedRequest.Id, result.Id);
             Assert.AreEqual(expectedRequest.Method, result.Method);

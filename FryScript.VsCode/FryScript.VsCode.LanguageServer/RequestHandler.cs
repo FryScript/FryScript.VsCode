@@ -14,7 +14,7 @@ namespace FryScript.VsCode.LanguageServer
             _protocolMethods = protocolMethods;
             _responseWriter = responseWriter;
 
-            _protocolMethods.OnSendClient += _protocolMethods_OnNotification;
+            _protocolMethods.OnClientRequest += _protocolMethods_OnNotification;
         }
 
         private void _protocolMethods_OnNotification(object obj)

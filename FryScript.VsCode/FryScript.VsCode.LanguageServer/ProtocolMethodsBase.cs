@@ -28,7 +28,7 @@ namespace FryScript.VsCode.LanguageServer
 
         private readonly Dictionary<string, MethodInvoker> _methodInvokers = new Dictionary<string, MethodInvoker>();
 
-        public event Action<object>? OnSendClient;
+        public event Action<object>? OnClientRequest;
 
         public Task<ResponseMessage> Execute(RequestMessage requestMessage)
         {
@@ -41,9 +41,9 @@ namespace FryScript.VsCode.LanguageServer
             });
         }
 
-        protected void SendClient(object val)
+        protected void ClientRequest(object val)
         {
-            OnSendClient?.Invoke(val);
+            OnClientRequest?.Invoke(val);
         }
 
         private MethodInvoker GetMethodInvoker(string method)
@@ -83,6 +83,15 @@ namespace FryScript.VsCode.LanguageServer
 
         private object? MissingMethod(object val)
         {
+            ClientRequest(new
+            {
+                method = "window/showMessage",
+                @params = new
+                {
+                    type = 3,
+                    message = "unsupported method"
+                }
+            });
             return null;
         }
     }

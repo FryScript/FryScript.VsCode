@@ -5,5 +5,7 @@
         public int Id { get; set; }
 
         public object? Result { get; set; }
+
+        public ResponseError? Error { get; set; }
     }
 }
