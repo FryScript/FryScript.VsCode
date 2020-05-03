@@ -9,7 +9,12 @@ namespace FryScript.VsCode.LanguageServer
     {
         private readonly TextWriter _textWriter;
 
-        public ResponseWriter(TextWriter textWriter) => _textWriter = textWriter;
+        public ResponseWriter(TextWriter textWriter)
+        {
+            _textWriter = textWriter;
+
+            textWriter.NewLine = "\r\n";
+        }
 
         public async Task Write(object? response)
         {
