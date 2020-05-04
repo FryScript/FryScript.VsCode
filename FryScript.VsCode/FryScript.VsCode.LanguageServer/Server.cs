@@ -11,11 +11,11 @@ namespace FryScript.VsCode.LanguageServer
         public Server(IRequestHandler requestHandler) 
             => (_requestHandler) = (requestHandler);
 
-        public CancellationToken Start()
+        public async Task Start()
         {
             while(true)
             {
-                _requestHandler.Handle().Wait();
+                await _requestHandler.Handle();
             }
         }
 

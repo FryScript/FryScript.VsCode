@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FryScript.VsCode.LanguageServer
 {
@@ -56,13 +57,13 @@ namespace FryScript.VsCode.LanguageServer
 
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //while (!Debugger.IsAttached) { }
 
             var server = Server.Build(new LSPMethods());
 
-            server.Start();
+            await server.Start();
         }
     }
 }
