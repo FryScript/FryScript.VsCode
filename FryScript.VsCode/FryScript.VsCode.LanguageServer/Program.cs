@@ -14,10 +14,15 @@ namespace FryScript.VsCode.LanguageServer
                 CompletionProvider = new CompletionOptions
                 {
                     TriggerCharacters = new[] {"."},
+                },
+                TextDocumentSync = new TextDocumentSyncOptions
+                {
+                    Change = TextDocumentSyncKind.Full,
+                    OpenClose = true
                 }
             })
             {
-                ServerInfo = new ServerInfo("Test language server"),
+                ServerInfo = new ServerInfo("Test language server")
             };
         }
 
@@ -45,11 +50,29 @@ namespace FryScript.VsCode.LanguageServer
                 @params = new
                 {
                     type = 3,
-                    message = "Text document completion reponse"
+                    message = $"Completion at {@params.TextDocument.Uri?.AbsolutePath ?? "Unknown uri"} line {@params.Position.Line} character {@params.Position.Character}"
                 }
             });
 
             return new object();
+        }
+
+        [ProtocolMethod("textDocument/didOpen")]
+        public object? TextDocumentDidOpen(DidOpenTextDocumentParams @params)
+        {
+            return null;
+        }
+
+        [ProtocolMethod("textDocument/didClose")]
+        public object? TextDocumentDidClose(DidCloseTextDocumentParams @params)
+        {
+            return null;
+        }
+
+        [ProtocolMethod("textDocument/didChange")]
+        public object? TextDocumentDidChange(DidChangeTextDocumentParams @params)
+        {
+            return null;
         }
     }
 
