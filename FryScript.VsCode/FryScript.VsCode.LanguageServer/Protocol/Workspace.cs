@@ -6,7 +6,7 @@
 
         public WorkspaceEditClientCapabilities? WorkspaceEdit { get; set; }
 
-        public DidChangeConfigurationClientCapabilities? didChangeCOnfiguration { get; set; }
+        public DidChangeConfigurationClientCapabilities? didChangeConfiguration { get; set; }
 
         public DidChangeWatchedFilesClientCapabilities? didChangeWatchedFiles { get; set; }
 

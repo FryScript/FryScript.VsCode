@@ -1,7 +1,5 @@
 ﻿using FryScript.VsCode.LanguageServer.Protocol;
-using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace FryScript.VsCode.LanguageServer
@@ -59,7 +57,7 @@ namespace FryScript.VsCode.LanguageServer
     {
         static async Task Main(string[] args)
         {
-            //while (!Debugger.IsAttached) { }
+            while (!Debugger.IsAttached) { }
 
             var server = Server.Build(new LSPMethods());
 
