@@ -1,6 +1,4 @@
-using FryScript.VsCode.LanguageServer.Protocol;
-
-namespace FryScript.VsCode.LanguageServer
+namespace FryScript.VsCode.LanguageServer.Protocol
 {
     public class DidCloseTextDocumentParams
     {

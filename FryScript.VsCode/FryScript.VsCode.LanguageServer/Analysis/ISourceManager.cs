@@ -2,7 +2,7 @@ using System;
 
 namespace FryScript.VsCode.LanguageServer.Analysis
 {
-    public interface ISourceAnalyser
+    public interface ISourceManager
     {
         bool TryOpen(Uri uri, out object? obj);
 

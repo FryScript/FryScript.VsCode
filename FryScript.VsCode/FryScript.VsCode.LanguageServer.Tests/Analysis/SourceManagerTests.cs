@@ -5,15 +5,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FryScript.VsCode.LanguageServer.Tests.Analysis
 {
     [TestClass]
-    public class SourceAnalyserTests
+    public class SourceManagerTests
     {
-        private SourceAnalyser _sourceAnalyser;
+        private SourceManager _sourceAnalyser;
         private Uri _uri;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _sourceAnalyser = new SourceAnalyser();
+            _sourceAnalyser = new SourceManager();
             _uri = new Uri("test://empty");
         }
 

@@ -1,4 +1,6 @@
-﻿using FryScript.VsCode.LanguageServer.Protocol;
+﻿using FryScript.VsCode.LanguageServer.Analysis;
+using FryScript.VsCode.LanguageServer.Protocol;
+using FryScript.VsCode.LanguageServer.Protocol.Constants;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -6,6 +8,8 @@ namespace FryScript.VsCode.LanguageServer
 {
     public class LSPMethods : ProtocolMethodsBase
     {
+        private readonly ISourceManager _sourceManager = new SourceManager();
+
         [ProtocolMethod("initialize")]
         public InitializeResult Initialize(InitializeParams @params)
         {
@@ -60,12 +64,16 @@ namespace FryScript.VsCode.LanguageServer
         [ProtocolMethod("textDocument/didOpen")]
         public object? TextDocumentDidOpen(DidOpenTextDocumentParams @params)
         {
+            _sourceManager.TryOpen(@params.TextDocument.Uri ?? Uris.Empty, out object? obj);
+
             return null;
         }
 
         [ProtocolMethod("textDocument/didClose")]
         public object? TextDocumentDidClose(DidCloseTextDocumentParams @params)
         {
+            _sourceManager.Close(@params.TextDocument.Uri ?? Uris.Empty);
+
             return null;
         }
 

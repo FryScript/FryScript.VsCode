@@ -1,6 +1,6 @@
 using System;
 
-namespace FryScript.VsCode.LanguageServer
+namespace FryScript.VsCode.LanguageServer.Protocol
 {
     public class TextDocumentItem
     {
