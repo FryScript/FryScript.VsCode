@@ -8,7 +8,7 @@ namespace FryScript.VsCode.LanguageServer
 {
     public class LSPMethods : ProtocolMethodsBase
     {
-        private readonly ISourceManager _sourceManager = new SourceManager();
+        private readonly ISourceManager _sourceManager = new SourceManager(new SourceAnalyser());
 
         [ProtocolMethod("initialize")]
         public InitializeResult Initialize(InitializeParams @params)
@@ -64,7 +64,7 @@ namespace FryScript.VsCode.LanguageServer
         [ProtocolMethod("textDocument/didOpen")]
         public object? TextDocumentDidOpen(DidOpenTextDocumentParams @params)
         {
-            _sourceManager.TryOpen(@params.TextDocument.Uri ?? Uris.Empty, out object? obj);
+            _sourceManager.Open(@params.TextDocument.Uri ?? Uris.Empty, @params.TextDocument.Text);
 
             return null;
         }
@@ -80,6 +80,8 @@ namespace FryScript.VsCode.LanguageServer
         [ProtocolMethod("textDocument/didChange")]
         public object? TextDocumentDidChange(DidChangeTextDocumentParams @params)
         {
+            var changes = @params.ContentChanges[0];
+            _sourceManager.Update(@params.TextDocument.Uri ?? Uris.Empty,  @params.ContentChanges[0].Text);
             return null;
         }
     }
