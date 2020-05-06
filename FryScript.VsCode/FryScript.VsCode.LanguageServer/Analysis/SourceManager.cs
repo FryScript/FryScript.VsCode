@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Concurrent;
+using FryScript.Ast;
 
 namespace FryScript.VsCode.LanguageServer.Analysis
 {
     public class SourceManager : ISourceManager
     {
-        private readonly ConcurrentDictionary<Uri, SourceInfo> _sources = new ConcurrentDictionary<Uri, SourceInfo>();
+        private readonly ConcurrentDictionary<Uri, ISourceInfo> _sources = new ConcurrentDictionary<Uri, ISourceInfo>();
         private readonly ISourceAnalyser _sourceAnalyser;
 
         public SourceManager(ISourceAnalyser sourceAnalyser) => (_sourceAnalyser) = sourceAnalyser;
@@ -16,7 +17,7 @@ namespace FryScript.VsCode.LanguageServer.Analysis
             {
                 var sourceInfo = _sourceAnalyser.GetInfo(uri, source);
 
-                _sources.TryAdd(uri, new SourceInfo());
+                _sources.TryAdd(uri, new SourceInfo(uri, new ScriptNode()));
 
                 return true;
             }
@@ -29,7 +30,7 @@ namespace FryScript.VsCode.LanguageServer.Analysis
             if(!_sources.ContainsKey(uri))
                 return false;
 
-            _sources.TryRemove(uri, out SourceInfo? sourceInfo);
+            _sources.TryRemove(uri, out ISourceInfo? sourceInfo);
 
             return true;
         }

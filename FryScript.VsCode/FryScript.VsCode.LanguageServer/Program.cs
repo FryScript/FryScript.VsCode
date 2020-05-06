@@ -1,14 +1,33 @@
-﻿using FryScript.VsCode.LanguageServer.Analysis;
+﻿using FryScript.Compilation;
+using FryScript.HostInterop;
+using FryScript.Parsing;
+using FryScript.ScriptProviders;
+using FryScript.VsCode.LanguageServer.Analysis;
 using FryScript.VsCode.LanguageServer.Protocol;
 using FryScript.VsCode.LanguageServer.Protocol.Constants;
+using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FryScript.VsCode.LanguageServer
 {
     public class LSPMethods : ProtocolMethodsBase
     {
-        private readonly ISourceManager _sourceManager = new SourceManager(new SourceAnalyser());
+        private readonly ISourceManager _sourceManager;
+
+        public LSPMethods()
+        {
+            var parser = new ScriptParser();
+            var runtime = new ScriptRuntime(
+                new DirectoryScriptProvider(Environment.CurrentDirectory),
+                new ScriptCompiler(parser, new ScriptParser(FryScriptLanguageData.LanguageData.Grammar.SnippetRoots.Single(n => n.Name == NodeNames.Expression))),
+                new ObjectRegistry(),
+                new ScriptObjectFactory(),
+                new TypeProvider());
+
+            _sourceManager = new SourceManager(new SourceAnalyser(runtime, parser, (uri, astNode) => new SourceInfo(uri, astNode)));
+        }
 
         [ProtocolMethod("initialize")]
         public InitializeResult Initialize(InitializeParams @params)
@@ -17,7 +36,7 @@ namespace FryScript.VsCode.LanguageServer
             {
                 CompletionProvider = new CompletionOptions
                 {
-                    TriggerCharacters = new[] {"."},
+                    TriggerCharacters = new[] { "." },
                 },
                 TextDocumentSync = new TextDocumentSyncOptions
                 {
@@ -81,7 +100,7 @@ namespace FryScript.VsCode.LanguageServer
         public object? TextDocumentDidChange(DidChangeTextDocumentParams @params)
         {
             var changes = @params.ContentChanges[0];
-            _sourceManager.Update(@params.TextDocument.Uri ?? Uris.Empty,  @params.ContentChanges[0].Text);
+            _sourceManager.Update(@params.TextDocument.Uri ?? Uris.Empty, @params.ContentChanges[0].Text);
             return null;
         }
     }

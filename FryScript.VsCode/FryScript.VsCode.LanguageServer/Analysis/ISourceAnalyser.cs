@@ -4,6 +4,6 @@ namespace FryScript.VsCode.LanguageServer.Analysis
 {
     public interface ISourceAnalyser
     {
-        SourceInfo GetInfo(Uri uri, string source);
+        ISourceInfo GetInfo(Uri uri, string source);
     }
 }
