@@ -5,6 +5,7 @@ using FryScript.Parsing;
 using FryScript.VsCode.LanguageServer.Analysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace FryScript.VsCode.LanguageServer.Tests.Analysis
 {
@@ -42,6 +43,31 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             var result = _sourceAnalyser.GetInfo(_uri, _source);
 
             Assert.AreEqual(expectedSourceInfo, result);
+        }
+
+        [TestMethod]
+        public void GetInfo_Handles_Parser_Exception()
+        {
+            var expectedMessage = "There was an error";
+            var expectedLine = 1;
+            var expectedColumn = 2;
+
+            _scriptParser.Parse(_source, _uri.AbsoluteUri, Arg.Any<CompilerContext>())
+                .Throws(new ParserException(
+                    expectedMessage,
+                    _uri.AbsoluteUri,
+                    expectedLine,
+                    expectedColumn));
+
+            _sourceInfoFactory.Invoke(_uri, Arg.Any<IRootNode>()).Returns(new SourceInfo(_uri, new ScriptNode()));
+
+            var result = _sourceAnalyser.GetInfo(_uri, _source);
+
+            Assert.AreEqual(1, result.Diagnostics.Count);
+            Assert.AreEqual(1, result.Diagnostics[0].Line);
+            Assert.AreEqual(2, result.Diagnostics[0].Column);
+            Assert.AreEqual(expectedMessage, result.Diagnostics[0].Message);
+            Assert.AreEqual(DiagnosticType.Error, result.Diagnostics[0].DiagnosticType);
         }
     }
 }
