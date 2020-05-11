@@ -100,9 +100,25 @@ namespace FryScript.VsCode.LanguageServer
         public object? TextDocumentDidChange(DidChangeTextDocumentParams @params)
         {
             var changes = @params.ContentChanges[0];
-            _sourceManager.Update(@params.TextDocument.Uri ?? Uris.Empty, @params.ContentChanges[0].Text);
+            var uri = @params.TextDocument.Uri ?? Uris.Empty;
+
+            _sourceManager.Update(uri, @params.ContentChanges[0].Text);
+
+            var info = _sourceManager.Update(uri, @params.ContentChanges.Single().Text);
+
+            ClientRequest(new 
+            {
+                method = "textDocument/publishDiagnostics",
+                @params = new 
+                {
+                    uri = @params.TextDocument.Uri,
+                    version = @params.TextDocument.Number,
+                    diagnostics = info.Diagnostics
+                }
+            });
+
             return null;
-        }
+        }   
     }
 
     class Program

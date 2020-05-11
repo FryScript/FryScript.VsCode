@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FryScript.Ast;
+using FryScript.VsCode.LanguageServer.Protocol;
 
 namespace FryScript.VsCode.LanguageServer.Analysis
 {
@@ -11,7 +13,9 @@ namespace FryScript.VsCode.LanguageServer.Analysis
 
         public Uri Uri => _uri;
 
-        public List<DiagnosticInfo> Diagnostics { get; } = new List<DiagnosticInfo>();
+        public List<Diagnostic> Diagnostics { get; } = new List<Diagnostic>();
+
+        public bool HasErrors => Diagnostics.Count(i => i.Severity == DiagnosticSeverity.Error) > 0;
 
         public SourceInfo(Uri uri, IRootNode rootNode) => (_uri, _rootNode) = (uri, rootNode);
     }

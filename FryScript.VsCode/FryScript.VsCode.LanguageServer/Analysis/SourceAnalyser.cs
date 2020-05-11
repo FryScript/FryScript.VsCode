@@ -2,6 +2,8 @@ using System;
 using FryScript.Ast;
 using FryScript.Compilation;
 using FryScript.Parsing;
+using FryScript.VsCode.LanguageServer.Protocol;
+using Range = FryScript.VsCode.LanguageServer.Protocol.Range;
 
 namespace FryScript.VsCode.LanguageServer.Analysis
 {
@@ -25,12 +27,25 @@ namespace FryScript.VsCode.LanguageServer.Analysis
             catch(ParserException ex)
             {
                 var info = _sourceInfoFactory(uri, new ScriptNode());
-                info.Diagnostics.Add(new DiagnosticInfo(
-                    ex.Line ?? 0,
-                    ex.Column ?? 0,
-                    ex.Message,
-                    DiagnosticType.Error
-                ));
+                info.Diagnostics.Add(new Diagnostic
+                {
+                    Message = ex.Message,
+                    Severity = DiagnosticSeverity.Error,
+                    Range = new Range
+                    {
+                        Start = new Position
+                        {
+                            Line = ex.Line ?? -1,
+                            Character = ex.Column ?? -1
+                        },
+
+                        End = new Position
+                        {
+                            Line = ex.Line ?? -1,
+                            Character = ex.Column + 1 ?? -1,
+                        }
+                    }
+                });
 
                 return info;
             }

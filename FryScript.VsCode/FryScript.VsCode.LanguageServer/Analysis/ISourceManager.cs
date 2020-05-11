@@ -8,6 +8,6 @@ namespace FryScript.VsCode.LanguageServer.Analysis
 
         bool Close(Uri uri);
 
-        void Update(Uri uri, string source);
+        ISourceInfo Update(Uri uri, string source);
     }
 }

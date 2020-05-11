@@ -3,6 +3,7 @@ using FryScript.Ast;
 using FryScript.Compilation;
 using FryScript.Parsing;
 using FryScript.VsCode.LanguageServer.Analysis;
+using FryScript.VsCode.LanguageServer.Protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -64,10 +65,12 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             var result = _sourceAnalyser.GetInfo(_uri, _source);
 
             Assert.AreEqual(1, result.Diagnostics.Count);
-            Assert.AreEqual(1, result.Diagnostics[0].Line);
-            Assert.AreEqual(2, result.Diagnostics[0].Column);
+            Assert.AreEqual(1, result.Diagnostics[0].Range.Start.Line);
+            Assert.AreEqual(1, result.Diagnostics[0].Range.End.Line);
+            Assert.AreEqual(2, result.Diagnostics[0].Range.Start.Character);
+            Assert.AreEqual(3, result.Diagnostics[0].Range.End.Character);
             Assert.AreEqual(expectedMessage, result.Diagnostics[0].Message);
-            Assert.AreEqual(DiagnosticType.Error, result.Diagnostics[0].DiagnosticType);
+            Assert.AreEqual(DiagnosticSeverity.Error, result.Diagnostics[0].Severity);
         }
     }
 }

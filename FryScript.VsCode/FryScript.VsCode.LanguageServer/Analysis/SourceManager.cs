@@ -35,7 +35,7 @@ namespace FryScript.VsCode.LanguageServer.Analysis
             return true;
         }
 
-        public void Update(Uri uri, string source)
+        public ISourceInfo Update(Uri uri, string source)
         {
             if(!_sources.ContainsKey(uri))
                 throw new InvalidOperationException($"Uri \"{uri.AbsolutePath}\" must be open before it can be updated");
@@ -43,6 +43,8 @@ namespace FryScript.VsCode.LanguageServer.Analysis
             var sourceInfo = _sourceAnalyser.GetInfo(uri, source);
 
             _sources.AddOrUpdate(uri, u => sourceInfo, (u, s) => sourceInfo);
+
+            return sourceInfo;
         }
     }
 }

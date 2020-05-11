@@ -12,6 +12,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
         private ISourceAnalyser _sourceAnalyser;
         private Uri _uri;
         private string _source;
+        private ISourceInfo _sourceInfo;
 
         [TestInitialize]
         public void TestInitialize()
@@ -20,6 +21,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             _sourceManager = new SourceManager(_sourceAnalyser);
             _uri = new Uri("test://empty");
             _source = "source";
+            _sourceInfo = Substitute.For<ISourceInfo>();
         }
 
         [TestMethod]
@@ -63,9 +65,11 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
         {
             _sourceManager.Open(_uri, _source);
 
-            _sourceManager.Update(_uri, _source);
-            
-            _sourceAnalyser.Received().GetInfo(_uri, _source);
+            _sourceAnalyser.GetInfo(_uri, _source).Returns(_sourceInfo);
+
+             var result = _sourceManager.Update(_uri, _source);
+
+            Assert.AreEqual(_sourceInfo, result);
         }
     }
 }
