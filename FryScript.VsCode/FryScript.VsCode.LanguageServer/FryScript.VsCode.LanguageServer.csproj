@@ -14,8 +14,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FryScript-Experimental" Version="0.0.0-CI-20200504-095004" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FryScript\FryScript\FryScript\FryScript.csproj" />
   </ItemGroup>
 
 </Project>

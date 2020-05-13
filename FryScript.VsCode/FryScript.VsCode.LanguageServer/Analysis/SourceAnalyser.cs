@@ -42,7 +42,7 @@ namespace FryScript.VsCode.LanguageServer.Analysis
                         End = new Position
                         {
                             Line = ex.Line ?? -1,
-                            Character = ex.Column + 1 ?? -1,
+                            Character = ex.Column + ex.TokenLength ?? -1,
                         }
                     }
                 });
