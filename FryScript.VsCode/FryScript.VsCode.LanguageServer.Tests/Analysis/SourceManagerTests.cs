@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using FryScript.VsCode.LanguageServer.Analysis;
+using FryScript.VsCode.LanguageServer.Protocol;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 
@@ -70,6 +72,39 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
              var result = _sourceManager.Update(_uri, _source);
 
             Assert.AreEqual(_sourceInfo, result);
+        }
+
+        [TestMethod]
+        public void Update_Handles_Info_With_Errors()
+        {
+            var sourceWithErrors = Substitute.For<ISourceInfo>();
+            var expectedFragments = new List<Fragment>
+            {
+                new Fragment()
+            };
+
+            var expectedDiagnostics = new List<Diagnostic>
+            {
+                new Diagnostic()
+            };
+            
+            sourceWithErrors.HasErrors.Returns(true);
+            sourceWithErrors.Fragments.Returns(expectedFragments);
+            sourceWithErrors.Diagnostics.Returns(expectedDiagnostics);
+
+            _sourceAnalyser.GetInfo(_uri, _source)
+                .Returns(c => _sourceInfo, c => sourceWithErrors);
+
+            _sourceManager.Open(_uri, _source);
+
+            _sourceInfo.HasErrors.Returns(true);
+            _sourceInfo.Fragments.Returns(new List<Fragment>());
+            _sourceInfo.Diagnostics.Returns(new List<Diagnostic>());
+
+            var result = _sourceManager.Update(_uri, _source);
+
+            Assert.AreEqual(1, result.Fragments.Count);
+            Assert.AreEqual(1, result.Diagnostics.Count);
         }
     }
 }

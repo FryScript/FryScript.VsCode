@@ -52,13 +52,15 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             var expectedMessage = "There was an error";
             var expectedLine = 1;
             var expectedColumn = 2;
+            var expectedTokenLength = 3;
 
             _scriptParser.Parse(_source, _uri.AbsoluteUri, Arg.Any<CompilerContext>())
                 .Throws(new ParserException(
                     expectedMessage,
                     _uri.AbsoluteUri,
                     expectedLine,
-                    expectedColumn));
+                    expectedColumn,
+                    expectedTokenLength));
 
             _sourceInfoFactory.Invoke(_uri, Arg.Any<IRootNode>()).Returns(new SourceInfo(_uri, new ScriptNode()));
 
@@ -68,7 +70,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             Assert.AreEqual(1, result.Diagnostics[0].Range.Start.Line);
             Assert.AreEqual(1, result.Diagnostics[0].Range.End.Line);
             Assert.AreEqual(2, result.Diagnostics[0].Range.Start.Character);
-            Assert.AreEqual(3, result.Diagnostics[0].Range.End.Character);
+            Assert.AreEqual(2 + 3, result.Diagnostics[0].Range.End.Character);
             Assert.AreEqual(expectedMessage, result.Diagnostics[0].Message);
             Assert.AreEqual(DiagnosticSeverity.Error, result.Diagnostics[0].Severity);
         }

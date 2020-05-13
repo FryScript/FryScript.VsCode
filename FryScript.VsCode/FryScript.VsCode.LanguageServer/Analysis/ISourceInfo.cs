@@ -10,6 +10,8 @@ namespace FryScript.VsCode.LanguageServer.Analysis
 
         List<Diagnostic> Diagnostics { get; }
 
+        List<Fragment> Fragments { get; }
+        
         bool HasErrors { get; }
     }
 }
