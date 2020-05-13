@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using FryScript.Ast;
 using FryScript.Compilation;
 using FryScript.Parsing;
 using FryScript.VsCode.LanguageServer.Protocol;
+using Irony.Parsing;
 using Range = FryScript.VsCode.LanguageServer.Protocol.Range;
 
 namespace FryScript.VsCode.LanguageServer.Analysis
@@ -27,6 +29,7 @@ namespace FryScript.VsCode.LanguageServer.Analysis
             catch(ParserException ex)
             {
                 var info = _sourceInfoFactory(uri, new ScriptNode());
+
                 info.Diagnostics.Add(new Diagnostic
                 {
                     Message = ex.Message,
@@ -46,6 +49,9 @@ namespace FryScript.VsCode.LanguageServer.Analysis
                         }
                     }
                 });
+
+                info.Fragments.AddRange(((TokenList)ex.InternalData)
+                    .Select(t => new Fragment(t.Terminal.Name, t.ValueString, t.Location.Line, t.Location.Column)));
 
                 return info;
             }

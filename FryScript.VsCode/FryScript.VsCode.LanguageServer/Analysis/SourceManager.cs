@@ -17,7 +17,7 @@ namespace FryScript.VsCode.LanguageServer.Analysis
             {
                 var sourceInfo = _sourceAnalyser.GetInfo(uri, source);
 
-                _sources.TryAdd(uri, new SourceInfo(uri, new ScriptNode()));
+                _sources.TryAdd(uri, sourceInfo);
 
                 return true;
             }
@@ -43,6 +43,14 @@ namespace FryScript.VsCode.LanguageServer.Analysis
             var sourceInfo = _sourceAnalyser.GetInfo(uri, source);
 
             return _sources.AddOrUpdate(uri, u => sourceInfo, (u, s) => AddOrUpdate(s, sourceInfo));
+        }
+
+        public ISourceInfo GetInfo(Uri uri)
+        {
+            if(!_sources.ContainsKey(uri))
+                throw new InvalidOperationException($"Uri \"{uri.AbsolutePath}\" must be open before it can be requested");
+
+            return _sources[uri];
         }
 
         private ISourceInfo AddOrUpdate(ISourceInfo originalSourceInfo, ISourceInfo newSourceInfo)

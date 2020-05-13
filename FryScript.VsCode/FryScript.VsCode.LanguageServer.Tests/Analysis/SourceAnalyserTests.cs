@@ -4,6 +4,7 @@ using FryScript.Compilation;
 using FryScript.Parsing;
 using FryScript.VsCode.LanguageServer.Analysis;
 using FryScript.VsCode.LanguageServer.Protocol;
+using Irony.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -53,6 +54,10 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             var expectedLine = 1;
             var expectedColumn = 2;
             var expectedTokenLength = 3;
+            var expectedTokens = new TokenList
+            {
+                new Token(new Terminal("Test"), new SourceLocation(), "Test", null)
+            };
 
             _scriptParser.Parse(_source, _uri.AbsoluteUri, Arg.Any<CompilerContext>())
                 .Throws(new ParserException(
@@ -67,12 +72,13 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             var result = _sourceAnalyser.GetInfo(_uri, _source);
 
             Assert.AreEqual(1, result.Diagnostics.Count);
-            Assert.AreEqual(1, result.Diagnostics[0].Range.Start.Line);
-            Assert.AreEqual(1, result.Diagnostics[0].Range.End.Line);
-            Assert.AreEqual(2, result.Diagnostics[0].Range.Start.Character);
-            Assert.AreEqual(2 + 3, result.Diagnostics[0].Range.End.Character);
+            Assert.AreEqual(expectedLine, result.Diagnostics[0].Range.Start.Line);
+            Assert.AreEqual(expectedLine, result.Diagnostics[0].Range.End.Line);
+            Assert.AreEqual(expectedColumn, result.Diagnostics[0].Range.Start.Character);
+            Assert.AreEqual(expectedLine + expectedTokenLength, result.Diagnostics[0].Range.End.Character);
             Assert.AreEqual(expectedMessage, result.Diagnostics[0].Message);
             Assert.AreEqual(DiagnosticSeverity.Error, result.Diagnostics[0].Severity);
+            Assert.AreEqual(1, result.Fragments.Count);
         }
     }
 }

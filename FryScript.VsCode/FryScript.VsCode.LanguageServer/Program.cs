@@ -67,17 +67,27 @@ namespace FryScript.VsCode.LanguageServer
         [ProtocolMethod("textDocument/completion")]
         public object? TextDocumentCompletion(CompletionParams @params)
         {
-            ClientRequest(new
-            {
-                method = "window/showMessage",
-                @params = new
-                {
-                    type = 3,
-                    message = $"Completion at {@params.TextDocument.Uri?.AbsolutePath ?? "Unknown uri"} line {@params.Position.Line} character {@params.Position.Character}"
-                }
-            });
+            // ClientRequest(new
+            // {
+            //     method = "window/showMessage",
+            //     @params = new
+            //     {
+            //         type = 3,
+            //         message = $"Completion at {@params.TextDocument.Uri?.AbsolutePath ?? "Unknown uri"} line {@params.Position.Line} character {@params.Position.Character}"
+            //     }
+            // });
+            var sourceInfo = _sourceManager.GetInfo(@params.TextDocument?.Uri ?? Uris.Empty);
 
-            return new object();
+            return sourceInfo
+                .Fragments
+                .Where(f => f.Type == "Identifier")
+                .GroupBy(f => f.Value)
+                .Select(grp => grp.First())
+                .Select(f => new CompletionItem
+                {
+                    Kind = CompletionItemKind.Field,
+                    Label = f.Value
+                }).ToArray();
         }
 
         [ProtocolMethod("textDocument/didOpen")]

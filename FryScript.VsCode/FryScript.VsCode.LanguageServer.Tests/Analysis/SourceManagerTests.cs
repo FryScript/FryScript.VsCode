@@ -23,7 +23,10 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             _sourceManager = new SourceManager(_sourceAnalyser);
             _uri = new Uri("test://empty");
             _source = "source";
+
             _sourceInfo = Substitute.For<ISourceInfo>();
+            _sourceInfo.Fragments.Returns(new List<Fragment>());
+            _sourceInfo.Diagnostics.Returns(new List<Diagnostic>());
         }
 
         [TestMethod]
@@ -65,9 +68,9 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
         [TestMethod]
         public void Update_Success()
         {
-            _sourceManager.Open(_uri, _source);
-
             _sourceAnalyser.GetInfo(_uri, _source).Returns(_sourceInfo);
+            
+            _sourceManager.Open(_uri, _source);
 
              var result = _sourceManager.Update(_uri, _source);
 
@@ -80,7 +83,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             var sourceWithErrors = Substitute.For<ISourceInfo>();
             var expectedFragments = new List<Fragment>
             {
-                new Fragment()
+                new Fragment("Test", "TestValue", 1, 2)
             };
 
             var expectedDiagnostics = new List<Diagnostic>
@@ -98,13 +101,29 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             _sourceManager.Open(_uri, _source);
 
             _sourceInfo.HasErrors.Returns(true);
-            _sourceInfo.Fragments.Returns(new List<Fragment>());
-            _sourceInfo.Diagnostics.Returns(new List<Diagnostic>());
 
             var result = _sourceManager.Update(_uri, _source);
 
-            Assert.AreEqual(1, result.Fragments.Count);
             Assert.AreEqual(1, result.Diagnostics.Count);
+            Assert.AreEqual(1, result.Fragments.Count);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void GetInfo_Source_Not_Open()
+        {
+            _sourceManager.GetInfo(_uri);
+        }
+
+        [TestMethod]
+        public void GetInfo_Source_Open()
+        {
+            _sourceAnalyser.GetInfo(_uri, _source).Returns(_sourceInfo);
+            _sourceManager.Open(_uri, _source);
+
+            var result = _sourceManager.GetInfo(_uri);
+
+            Assert.AreEqual(_sourceInfo, result);
         }
     }
 }
