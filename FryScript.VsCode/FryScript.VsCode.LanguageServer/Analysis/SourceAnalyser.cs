@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using FryScript.Ast;
 using FryScript.Compilation;
+using FryScript.Debugging;
 using FryScript.Parsing;
 using FryScript.VsCode.LanguageServer.Protocol;
 using Irony.Parsing;
@@ -9,6 +10,32 @@ using Range = FryScript.VsCode.LanguageServer.Protocol.Range;
 
 namespace FryScript.VsCode.LanguageServer.Analysis
 {
+    public class AnalysisScriptRuntime : IScriptRuntime
+    {
+        public bool DetailedExceptions { get; set; }
+        public DebugHook DebugHook { get; set; } = null!;
+
+        public object Eval(string script)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IScriptObject Get(string name, Uri relativeTo = null!)
+        {
+            return new ScriptObject();
+        }
+
+        public IScriptObject Import(Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IScriptObject New(string name, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class SourceAnalyser : ISourceAnalyser
     {
         private readonly IScriptRuntime _runtime;
@@ -20,13 +47,20 @@ namespace FryScript.VsCode.LanguageServer.Analysis
 
         public ISourceInfo GetInfo(Uri uri, string source)
         {
+            if(string.IsNullOrWhiteSpace(source))
+                return _sourceInfoFactory(uri, new ScriptNode());
+                
             try
             {
                 var rootNode = _parser.Parse(source, uri.AbsoluteUri, new CompilerContext(_runtime, uri, false));
 
+                var compiler = new ScriptCompiler(_parser, _parser);
+
+                var func = compiler.Compile(source, uri.AbsolutePath, new CompilerContext(new AnalysisScriptRuntime(), uri));
+
                 return _sourceInfoFactory(uri, rootNode);
             }
-            catch(ParserException ex)
+            catch (FryScriptException ex)
             {
                 var info = _sourceInfoFactory(uri, new ScriptNode());
 
@@ -50,8 +84,9 @@ namespace FryScript.VsCode.LanguageServer.Analysis
                     }
                 });
 
-                info.Fragments.AddRange(((TokenList)ex.InternalData)
-                    .Select(t => new Fragment(t.Terminal.Name, t.ValueString, t.Location.Line, t.Location.Column)));
+                if(ex.InternalData != null)
+                    info.Fragments.AddRange(((TokenList)ex.InternalData)
+                        .Select(t => new Fragment(t.Terminal.Name, t.ValueString, t.Location.Line, t.Location.Column)));
 
                 return info;
             }

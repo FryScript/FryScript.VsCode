@@ -75,10 +75,23 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             Assert.AreEqual(expectedLine, result.Diagnostics[0].Range.Start.Line);
             Assert.AreEqual(expectedLine, result.Diagnostics[0].Range.End.Line);
             Assert.AreEqual(expectedColumn, result.Diagnostics[0].Range.Start.Character);
-            Assert.AreEqual(expectedLine + expectedTokenLength, result.Diagnostics[0].Range.End.Character);
+            Assert.AreEqual(expectedLine + expectedTokenLength + 1, result.Diagnostics[0].Range.End.Character);
             Assert.AreEqual(expectedMessage, result.Diagnostics[0].Message);
             Assert.AreEqual(DiagnosticSeverity.Error, result.Diagnostics[0].Severity);
-            Assert.AreEqual(1, result.Fragments.Count);
+            Assert.AreEqual(0, result.Fragments.Count);
+        }
+
+        [DataTestMethod]
+        [DataRow("")]
+        [DataRow("  ")]
+        public void GetInfo_Handles_Empty_Source(string source)
+        {
+            var expectedSourceInfo = new SourceInfo(_uri, new ScriptNode());
+            _sourceInfoFactory.Invoke(_uri, Arg.Any<IRootNode>()).Returns(expectedSourceInfo);
+
+            var result = _sourceAnalyser.GetInfo(_uri, source);
+
+            Assert.AreEqual(expectedSourceInfo, result);
         }
     }
 }
