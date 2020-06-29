@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FryScript.Compilation;
 using FryScript.VsCode.LanguageServer.Protocol;
 
 namespace FryScript.VsCode.LanguageServer.Analysis
@@ -13,5 +14,9 @@ namespace FryScript.VsCode.LanguageServer.Analysis
         List<Fragment> Fragments { get; }
         
         bool HasErrors { get; }
+
+        Scope Scope { get; set; }
+
+        int GetPosition(int line, int column);
     }
 }

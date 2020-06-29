@@ -3,6 +3,7 @@ using FryScript.HostInterop;
 using FryScript.Parsing;
 using FryScript.ScriptProviders;
 using FryScript.VsCode.LanguageServer.Analysis;
+using FryScript.VsCode.LanguageServer.FryScriptExtensions;
 using FryScript.VsCode.LanguageServer.Protocol;
 using FryScript.VsCode.LanguageServer.Protocol.Constants;
 using System;
@@ -19,14 +20,15 @@ namespace FryScript.VsCode.LanguageServer
         public LSPMethods()
         {
             var parser = new ScriptParser();
+            var compiler = new ScriptCompiler(parser, new ScriptParser(FryScriptLanguageData.LanguageData.Grammar.SnippetRoots.Single(n => n.Name == NodeNames.Expression)));
             var runtime = new ScriptRuntime(
                 new DirectoryScriptProvider(Environment.CurrentDirectory),
-                new ScriptCompiler(parser, new ScriptParser(FryScriptLanguageData.LanguageData.Grammar.SnippetRoots.Single(n => n.Name == NodeNames.Expression))),
+                compiler,
                 new ObjectRegistry(),
                 new ScriptObjectFactory(),
                 new TypeProvider());
 
-            _sourceManager = new SourceManager(new SourceAnalyser(runtime, parser, (uri, astNode) => new SourceInfo(uri, astNode)));
+            _sourceManager = new SourceManager(new SourceAnalyser(runtime, compiler, (uri, source, astNode) => new SourceInfo(uri, source, astNode)));
         }
 
         [ProtocolMethod("initialize")]
@@ -78,16 +80,27 @@ namespace FryScript.VsCode.LanguageServer
             // });
             var sourceInfo = _sourceManager.GetInfo(@params.TextDocument?.Uri ?? Uris.Empty);
 
-            return sourceInfo
-                .Fragments
-                .Where(f => f.Type == "Identifier")
-                .GroupBy(f => f.Value)
-                .Select(grp => grp.First())
-                .Select(f => new CompletionItem
-                {
-                    Kind = CompletionItemKind.Field,
-                    Label = f.Value
-                }).ToArray();
+            var position = sourceInfo.GetPosition(@params.Position.Line, @params.Position.Character);
+
+            var members = sourceInfo.Scope.GetCompletions(position);
+
+            return members.Select(m => new CompletionItem
+            {
+                Kind= CompletionItemKind.Field,
+                Label = m.Name
+            });
+
+
+            //return sourceInfo
+            //    .Fragments
+            //    .Where(f => f.Type == "Identifier")
+            //    .GroupBy(f => f.Value)
+            //    .Select(grp => grp.First())
+            //    .Select(f => new CompletionItem
+            //    {
+            //        Kind = CompletionItemKind.Field,
+            //        Label = f.Value
+            //    }).ToArray();
         }
 
         [ProtocolMethod("textDocument/didOpen")]
@@ -109,10 +122,8 @@ namespace FryScript.VsCode.LanguageServer
         [ProtocolMethod("textDocument/didChange")]
         public object? TextDocumentDidChange(DidChangeTextDocumentParams @params)
         {
-            var changes = @params.ContentChanges[0];
+            
             var uri = @params.TextDocument.Uri ?? Uris.Empty;
-
-            _sourceManager.Update(uri, @params.ContentChanges[0].Text);
 
             var info = _sourceManager.Update(uri, @params.ContentChanges.Single().Text);
 

@@ -16,8 +16,8 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
     {
         private SourceAnalyser _sourceAnalyser;
         private IScriptRuntime _runtime;
-        private IScriptParser _scriptParser;
-        private Func<Uri, IRootNode, ISourceInfo> _sourceInfoFactory;
+        private IScriptCompiler _scriptCompiler;
+        private Func<Uri, string, IRootNode, ISourceInfo> _sourceInfoFactory;
         private string _source;
         private Uri _uri;
 
@@ -27,9 +27,10 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             _source = "source";
             _uri = new Uri("source://info");
             _runtime = Substitute.For<IScriptRuntime>();
-            _scriptParser = Substitute.For<IScriptParser>();
-            _sourceInfoFactory = Substitute.For<Func<Uri, IRootNode, ISourceInfo>>();
-            _sourceAnalyser = new SourceAnalyser(_runtime, _scriptParser, _sourceInfoFactory);
+            _scriptCompiler = Substitute.For<IScriptCompiler>();
+
+            _sourceInfoFactory = Substitute.For<Func<Uri, string, IRootNode, ISourceInfo>>();
+            _sourceAnalyser = new SourceAnalyser(_runtime, _scriptCompiler, _sourceInfoFactory);
         }
 
         [TestMethod]
@@ -38,9 +39,13 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
             var expectedRoot = Substitute.For<IRootNode>();
             var expectedSourceInfo = Substitute.For<ISourceInfo>();
 
-            _scriptParser.Parse(_source, _uri.AbsoluteUri, Arg.Any<CompilerContext>()).Returns(expectedRoot);
+            _scriptCompiler
+                .Compile(
+                _source,
+                _uri.AbsolutePath,
+                Arg.Do<CompilerContext>(c => c.RootNode = expectedRoot));
 
-            _sourceInfoFactory.Invoke(_uri, expectedRoot).Returns(expectedSourceInfo);
+            _sourceInfoFactory.Invoke(_uri, _source, expectedRoot).Returns(expectedSourceInfo);
 
             var result = _sourceAnalyser.GetInfo(_uri, _source);
 
@@ -48,7 +53,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
         }
 
         [TestMethod]
-        public void GetInfo_Handles_Parser_Exception()
+        public void GetInfo_Handles_FryScript_Exception()
         {
             var expectedMessage = "There was an error";
             var expectedLine = 1;
@@ -59,7 +64,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
                 new Token(new Terminal("Test"), new SourceLocation(), "Test", null)
             };
 
-            _scriptParser.Parse(_source, _uri.AbsoluteUri, Arg.Any<CompilerContext>())
+            _scriptCompiler.Compile(_source, _uri.AbsolutePath, Arg.Any<CompilerContext>())
                 .Throws(new ParserException(
                     expectedMessage,
                     _uri.AbsoluteUri,
@@ -67,7 +72,7 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
                     expectedColumn,
                     expectedTokenLength));
 
-            _sourceInfoFactory.Invoke(_uri, Arg.Any<IRootNode>()).Returns(new SourceInfo(_uri, new ScriptNode()));
+            _sourceInfoFactory.Invoke(_uri, _source, Arg.Any<IRootNode>()).Returns(new SourceInfo(_uri, string.Empty, new ScriptNode()));
 
             var result = _sourceAnalyser.GetInfo(_uri, _source);
 
@@ -86,8 +91,8 @@ namespace FryScript.VsCode.LanguageServer.Tests.Analysis
         [DataRow("  ")]
         public void GetInfo_Handles_Empty_Source(string source)
         {
-            var expectedSourceInfo = new SourceInfo(_uri, new ScriptNode());
-            _sourceInfoFactory.Invoke(_uri, Arg.Any<IRootNode>()).Returns(expectedSourceInfo);
+            var expectedSourceInfo = new SourceInfo(_uri, string.Empty, new ScriptNode());
+            _sourceInfoFactory.Invoke(_uri, string.Empty, Arg.Any<IRootNode>()).Returns(expectedSourceInfo);
 
             var result = _sourceAnalyser.GetInfo(_uri, source);
 

@@ -42,7 +42,12 @@ namespace FryScript.VsCode.LanguageServer.Analysis
 
             var sourceInfo = _sourceAnalyser.GetInfo(uri, source);
 
-            return _sources.AddOrUpdate(uri, u => sourceInfo, (u, s) => AddOrUpdate(s, sourceInfo));
+            if (sourceInfo.HasErrors)
+                return AddOrUpdate(_sources[uri], sourceInfo);
+
+            //return _sources.AddOrUpdate(uri, u => sourceInfo, (u, s) => AddOrUpdate(s, sourceInfo));
+
+            return _sources[uri] = sourceInfo;
         }
 
         public ISourceInfo GetInfo(Uri uri)

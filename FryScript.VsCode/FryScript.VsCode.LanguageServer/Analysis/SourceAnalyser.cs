@@ -39,30 +39,32 @@ namespace FryScript.VsCode.LanguageServer.Analysis
     public class SourceAnalyser : ISourceAnalyser
     {
         private readonly IScriptRuntime _runtime;
-        private readonly IScriptParser _parser;
-        private readonly Func<Uri, IRootNode, ISourceInfo> _sourceInfoFactory;
+        private readonly IScriptCompiler _compiler;
+        private readonly Func<Uri, string, IRootNode, ISourceInfo> _sourceInfoFactory;
 
-        public SourceAnalyser(IScriptRuntime runtime, IScriptParser parser, Func<Uri, IRootNode, ISourceInfo> sourceInfoFactory)
-            => (_runtime, _parser, _sourceInfoFactory) = (runtime, parser, sourceInfoFactory);
+        public SourceAnalyser(IScriptRuntime runtime, IScriptCompiler compiler, Func<Uri, string, IRootNode, ISourceInfo> sourceInfoFactory)
+            => (_runtime, _compiler, _sourceInfoFactory) = (runtime, compiler, sourceInfoFactory);
 
         public ISourceInfo GetInfo(Uri uri, string source)
         {
             if(string.IsNullOrWhiteSpace(source))
-                return _sourceInfoFactory(uri, new ScriptNode());
+                return _sourceInfoFactory(uri, string.Empty, new ScriptNode());
                 
             try
             {
-                var rootNode = _parser.Parse(source, uri.AbsoluteUri, new CompilerContext(_runtime, uri, false));
+                var context = new CompilerContext(new AnalysisScriptRuntime(), uri);
 
-                var compiler = new ScriptCompiler(_parser, _parser);
+                _compiler.Compile(source, uri.AbsolutePath, context);
 
-                var func = compiler.Compile(source, uri.AbsolutePath, new CompilerContext(new AnalysisScriptRuntime(), uri));
+                var info = _sourceInfoFactory(uri, source, context.RootNode);
 
-                return _sourceInfoFactory(uri, rootNode);
+                info.Scope = context.Scope;
+
+                return info;
             }
             catch (FryScriptException ex)
             {
-                var info = _sourceInfoFactory(uri, new ScriptNode());
+                var info = _sourceInfoFactory(uri, source, new ScriptNode());
 
                 info.Diagnostics.Add(new Diagnostic
                 {
@@ -90,6 +92,7 @@ namespace FryScript.VsCode.LanguageServer.Analysis
 
                 return info;
             }
+            
         }
     }
 }

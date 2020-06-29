@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FryScript.VsCode.LanguageSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FryScript.VsCode.LanguageServer.Tests", "FryScript.VsCode.LanguageServer.Tests\FryScript.VsCode.LanguageServer.Tests.csproj", "{D97B3835-094E-4102-97AA-342CE5D6D585}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FryScript", "..\..\FryScript\FryScript\FryScript\FryScript.csproj", "{DACDD8CD-7DA1-42BD-84DC-0F0B0B4CFC58}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{D97B3835-094E-4102-97AA-342CE5D6D585}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D97B3835-094E-4102-97AA-342CE5D6D585}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D97B3835-094E-4102-97AA-342CE5D6D585}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DACDD8CD-7DA1-42BD-84DC-0F0B0B4CFC58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DACDD8CD-7DA1-42BD-84DC-0F0B0B4CFC58}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DACDD8CD-7DA1-42BD-84DC-0F0B0B4CFC58}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DACDD8CD-7DA1-42BD-84DC-0F0B0B4CFC58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
