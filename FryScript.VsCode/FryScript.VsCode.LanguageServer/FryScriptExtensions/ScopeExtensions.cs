@@ -15,7 +15,7 @@ namespace FryScript.VsCode.LanguageServer.FryScriptExtensions
             if (!scope.PositionMatch(position))
                 return scope.GetAllowedMembers();
 
-            var deeperScope = scope.Children.FirstOrDefault(c => c.PositionMatch(position));
+            var deeperScope = scope.Children.LastOrDefault();
 
             if (deeperScope == null)
                 return scope.GetAllowedMembers().Where(m => m.AstNode.ParseNode.Span.Location.Position <= position);
