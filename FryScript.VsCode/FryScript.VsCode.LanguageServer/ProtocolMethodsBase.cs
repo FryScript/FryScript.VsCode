@@ -83,15 +83,15 @@ namespace FryScript.VsCode.LanguageServer
 
         private object? MissingMethod(object val)
         {
-            ClientRequest(new
-            {
-                method = "window/showMessage",
-                @params = new
-                {
-                    type = 3,
-                    message = "unsupported method"
-                }
-            });
+            //ClientRequest(new
+            //{
+            //    method = "window/showMessage",
+            //    @params = new
+            //    {
+            //        type = 3,
+            //        message = "unsupported method"
+            //    }
+            //});
             return null;
         }
     }

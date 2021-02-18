@@ -51,7 +51,7 @@ namespace FryScript.VsCode.LanguageServer
                 @params = new
                 {
                     type = 3,
-                    message = "Server test for version 0.0.1"
+                    message = "FryScript language server started"
                 }
             });
             return null;

@@ -3,7 +3,7 @@
     "displayName": "Fry Script",
     "description": "Fry Script Language Support",
     "version": "0.0.1",
-    "publisher": "Fry Script",
+    "publisher": "FryScript",
     "engines": {
         "vscode": "^1.38.0"
     },
@@ -19,7 +19,7 @@
             {
                 "id": "fryscript",
                 "aliases": [
-                    "Fry Script",
+                    "FryScript",
                     "fryscript"
                 ],
                 "extensions": [
