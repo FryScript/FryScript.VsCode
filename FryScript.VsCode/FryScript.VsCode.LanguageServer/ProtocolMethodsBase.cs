@@ -30,7 +30,7 @@ namespace FryScript.VsCode.LanguageServer
 
         public event Action<object>? OnClientRequest;
 
-        public Task<ResponseMessage> Execute(RequestMessage requestMessage)
+        public Task<ResponseMessage> ExecuteAsync(RequestMessage requestMessage)
         {
             var methodInvoker = GetMethodInvoker(requestMessage.Method);
 

@@ -4,6 +4,6 @@ namespace FryScript.VsCode.LanguageServer
 {
     public interface IResponseWriter
     {
-        Task Write(object? response);
+        Task WriteAsync(object? response);
     }
 }

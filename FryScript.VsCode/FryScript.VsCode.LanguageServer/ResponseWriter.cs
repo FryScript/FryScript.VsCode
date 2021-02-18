@@ -16,7 +16,7 @@ namespace FryScript.VsCode.LanguageServer
             textWriter.NewLine = "\r\n";
         }
 
-        public async Task Write(object? response)
+        public async Task WriteAsync(object? response)
         {
             if (response == null)
                 return;

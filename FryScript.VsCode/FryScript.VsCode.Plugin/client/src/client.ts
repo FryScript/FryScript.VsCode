@@ -12,22 +12,17 @@ import { platform } from 'process';
 
 export function activate(context: ExtensionContext) {
 
-	// The server is implemented in node
-
-	//let serverModule = 'dotnet';
-	//let arg = context.asAbsolutePath('bin/netcoreApp2.1/LanguageServer.dll')
-	//let runCommand = context.asAbsolutePath('bin/netcoreapp2.2/linux-x64/LanguageServer');
-	// The debug options for the server
+	// The server is implemented in node as a thin wrapper to a dotnet core application
 	let debugOptions = { execArgv: ["--nolazy", "--inspect=6009"] };
 
 	let binPath = undefined;
 
 	switch (platform) {
 		case "win32":
-			binPath = 'bin/netcoreapp3.1/win10-x64/FryScript.VsCode.LanguageServer.exe';
+			binPath = 'bin/netcoreapp5.0/win10-x64/FryScript.VsCode.LanguageServer.exe';
 			break;
 		case "linux":
-			binPath = 'bin/netcoreapp3.1/linux-x64/FryScript.VsCode.LanguageServer';
+			binPath = 'bin/netcoreapp5.0/linux-x64/FryScript.VsCode.LanguageServer';
 			break;
 		default:
 			throw new Error(`Failed to launch language server. Unsupported platform "${process.platform}"`);

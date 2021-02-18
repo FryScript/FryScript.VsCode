@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FryScript.VsCode.LanguageServer
@@ -11,11 +10,11 @@ namespace FryScript.VsCode.LanguageServer
         public Server(IRequestHandler requestHandler) 
             => (_requestHandler) = (requestHandler);
 
-        public async Task Start()
+        public async Task StartAsync()
         {
             while(true)
             {
-                await _requestHandler.Handle();
+                await _requestHandler.HandleAsync();
             }
         }
 

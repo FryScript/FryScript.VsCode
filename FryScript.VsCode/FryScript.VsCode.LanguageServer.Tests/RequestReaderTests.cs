@@ -25,39 +25,39 @@ namespace FryScript.VsCode.LanguageServer.Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Read_Header_Null_Content_Length_Header_Exception()
+        public async Task ReadAsync_Header_Null_Content_Length_Header_Exception()
         {
             _textReader
                 .ReadLineAsync()
                 .Returns(Task.FromResult<string>(null));
 
-            await _requestReader.Read();
+            await _requestReader.ReadAsync();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Read_Header_Malformed_Content_Length_Exception()
+        public async Task ReadAsync_Header_Malformed_Content_Length_Exception()
         {
             _textReader
                 .ReadLineAsync()
                 .Returns(Task.FromResult("Content-Length 100"));
 
-            await _requestReader.Read();
+            await _requestReader.ReadAsync();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Read_Header_Non_Int_Content_Length_Exception()
+        public async Task ReadAsync_Header_Non_Int_Content_Length_Exception()
         {
             _textReader
                 .ReadLineAsync()
                 .Returns(Task.FromResult("Content-Length: error"));
 
-            await _requestReader.Read();
+            await _requestReader.ReadAsync();
         }
 
         [TestMethod]
-        public async Task Read_Header_Success()
+        public async Task ReadAsync_Header_Success()
         {
             var expectedRequest = new RequestMessage
             {
@@ -82,7 +82,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
                 }), 0, requestJson.Length)
                 .Returns(Task.FromResult(requestJson.Length));
 
-            var result = await _requestReader.Read();
+            var result = await _requestReader.ReadAsync();
 
             Assert.AreEqual(expectedRequest.Id, result.Id);
             Assert.AreEqual(expectedRequest.Method, result.Method);

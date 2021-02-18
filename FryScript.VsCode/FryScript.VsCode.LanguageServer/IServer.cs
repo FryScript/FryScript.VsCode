@@ -5,6 +5,6 @@ namespace FryScript.VsCode.LanguageServer
 {
     public interface IServer
     {
-        Task Start();
+        Task StartAsync();
     }
 }

@@ -14,7 +14,7 @@ namespace FryScript.VsCode.LanguageServer
 
         public RequestReader(TextReader textReader) => _textReader = textReader;
 
-        public async Task<RequestMessage> Read()
+        public async Task<RequestMessage> ReadAsync()
         {
             var contentLine = await _textReader.ReadLineAsync();
             await _textReader.ReadLineAsync();

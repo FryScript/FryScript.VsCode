@@ -23,17 +23,17 @@ namespace FryScript.VsCode.LanguageServer.Tests
         }
 
         [TestMethod]
-        public async Task Handle_Success()
+        public async Task HandleAsync_Success()
         {
             var requestMessage = new RequestMessage();
             var expectedResponse = new ResponseMessage();
 
-            _requestReader.Read().Returns(Task.FromResult(requestMessage));
-            _protocolMethods.Execute(requestMessage).Returns(Task.FromResult(expectedResponse));
+            _requestReader.ReadAsync().Returns(Task.FromResult(requestMessage));
+            _protocolMethods.ExecuteAsync(requestMessage).Returns(Task.FromResult(expectedResponse));
 
-            await _requestHandler.Handle();
+            await _requestHandler.HandleAsync();
 
-            await _responseWriter.Received().Write(expectedResponse);
+            await _responseWriter.Received().WriteAsync(expectedResponse);
         }
     }
 }

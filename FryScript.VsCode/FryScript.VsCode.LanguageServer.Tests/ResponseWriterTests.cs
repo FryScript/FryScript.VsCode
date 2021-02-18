@@ -22,7 +22,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
         }
 
         [TestMethod]
-        public async Task Write_Success()
+        public async Task WriteAsync_Success()
         {
             var response = new ResponseMessage
             {
@@ -32,7 +32,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
 
             var expectedJson = JsonConvert.SerializeObject(response, JsonOptions.CamelCase);
 
-            await _responseWriter.Write(response);
+            await _responseWriter.WriteAsync(response);
 
             await _textWriter.Received().WriteLineAsync($"Content-Length: {expectedJson.Length}");
             await _textWriter.Received().WriteLineAsync();
@@ -40,9 +40,9 @@ namespace FryScript.VsCode.LanguageServer.Tests
         }
 
         [TestMethod]
-        public async Task Write_Handles_Null_Response()
+        public async Task WriteAsync_Handles_Null_Response()
         {
-            await _responseWriter.Write(null);
+            await _responseWriter.WriteAsync(null);
 
             await _textWriter.DidNotReceive().WriteLineAsync();
             await _textWriter.DidNotReceive().WriteAsync(Arg.Any<string>());

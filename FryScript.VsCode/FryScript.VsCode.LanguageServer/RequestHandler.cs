@@ -19,14 +19,14 @@ namespace FryScript.VsCode.LanguageServer
 
         private void _protocolMethods_OnNotification(object obj)
         {
-            _responseWriter.Write(obj);
+            _responseWriter.WriteAsync(obj);
         }
 
-        public async Task Handle()
+        public async Task HandleAsync()
         {
-            var requestMessage = await _requestReader.Read();
-            var responseMessage = await _protocolMethods.Execute(requestMessage);
-            await _responseWriter.Write(responseMessage);
+            var requestMessage = await _requestReader.ReadAsync();
+            var responseMessage = await _protocolMethods.ExecuteAsync(requestMessage);
+            await _responseWriter.WriteAsync(responseMessage);
         }
     }
 }

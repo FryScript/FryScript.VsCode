@@ -4,6 +4,6 @@ namespace FryScript.VsCode.LanguageServer
 {
     public interface IRequestHandler
     {
-        Task Handle();
+        Task HandleAsync();
     }
 }

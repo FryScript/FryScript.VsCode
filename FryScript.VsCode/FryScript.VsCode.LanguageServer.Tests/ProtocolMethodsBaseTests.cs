@@ -51,7 +51,7 @@ namespace FryScript.VsCode.LanguageServer.Tests
         }
 
         [TestMethod]
-        public async Task Execute_Success()
+        public async Task ExecuteeAsync_Success()
         {
 
             var requestMessage = new RequestMessage
@@ -64,30 +64,30 @@ namespace FryScript.VsCode.LanguageServer.Tests
                 Id = 100
             };
 
-            var response = await _testProtocolMethods.Execute(requestMessage);
+            var response = await _testProtocolMethods.ExecuteAsync(requestMessage);
 
             Assert.IsInstanceOfType(response.Result, typeof(TestResponse));
             Assert.AreEqual(100, response.Id);
         }
 
         [TestMethod]
-        public async Task Execute_Unhandled_Request()
+        public async Task ExecuteAsync_Unhandled_Request()
         {
             var requestMessage = new RequestMessage
             {
                 Method = "method/unregistered",
             };
 
-            var response = await _testProtocolMethods.Execute(requestMessage);
+            var response = await _testProtocolMethods.ExecuteAsync(requestMessage);
 
             Assert.IsNull(response.Result);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Execute_Method_With_No_Parameters()
+        public async Task ExecuteAsync_Method_With_No_Parameters()
         {
-            await _testProtocolMethods.Execute(new RequestMessage
+            await _testProtocolMethods.ExecuteAsync(new RequestMessage
             {
                 Method = "method/missingParameter"
             });
@@ -95,9 +95,9 @@ namespace FryScript.VsCode.LanguageServer.Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Execute_Method_Void_Return()
+        public async Task ExecuteAsync_Method_Void_Return()
         {
-            await _testProtocolMethods.Execute(new RequestMessage
+            await _testProtocolMethods.ExecuteAsync(new RequestMessage
             {
                 Method = "method/voidReturn"
             });

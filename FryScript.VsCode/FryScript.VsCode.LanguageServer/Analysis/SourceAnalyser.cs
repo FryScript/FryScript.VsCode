@@ -1,41 +1,13 @@
-using System;
-using System.Linq;
 using FryScript.Ast;
 using FryScript.Compilation;
-using FryScript.Debugging;
-using FryScript.Parsing;
 using FryScript.VsCode.LanguageServer.Protocol;
 using Irony.Parsing;
+using System;
+using System.Linq;
 using Range = FryScript.VsCode.LanguageServer.Protocol.Range;
 
 namespace FryScript.VsCode.LanguageServer.Analysis
 {
-    public class AnalysisScriptRuntime : IScriptRuntime
-    {
-        public bool DetailedExceptions { get; set; }
-        public DebugHook DebugHook { get; set; } = null!;
-
-        public object Eval(string script)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IScriptObject Get(string name, Uri relativeTo = null!)
-        {
-            return new ScriptObject();
-        }
-
-        public IScriptObject Import(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IScriptObject New(string name, params object[] args)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class SourceAnalyser : ISourceAnalyser
     {
         private readonly IScriptRuntime _runtime;
@@ -52,7 +24,7 @@ namespace FryScript.VsCode.LanguageServer.Analysis
                 
             try
             {
-                var context = new CompilerContext(new AnalysisScriptRuntime(), uri);
+                var context = new CompilerContext(_runtime, uri);
 
                 _compiler.Compile(source, uri.AbsolutePath, context);
 

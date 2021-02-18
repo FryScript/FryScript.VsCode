@@ -12,7 +12,7 @@ switch (platform) {
         break;
 }
 
-let process = spawn('dotnet', ['publish', '../FryScript.VsCode.LanguageServer', '-r', runtime, '-f', 'netcoreapp3.1', '-c', 'Debug']);
+let process = spawn('dotnet', ['publish', '../FryScript.VsCode.LanguageServer', '-r', runtime, '-f', 'netcoreapp5.0', '-c', 'Debug']);
 
 process.stdout.on('data', data => {
     console.log(`${data}`);

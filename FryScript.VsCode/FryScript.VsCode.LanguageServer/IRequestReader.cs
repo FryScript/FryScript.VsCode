@@ -5,6 +5,6 @@ namespace FryScript.VsCode.LanguageServer
 {
     public interface IRequestReader
     {
-        Task<RequestMessage> Read();
+        Task<RequestMessage> ReadAsync();
     }
 }

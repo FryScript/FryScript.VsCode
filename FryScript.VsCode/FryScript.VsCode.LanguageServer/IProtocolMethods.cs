@@ -6,7 +6,7 @@ namespace FryScript.VsCode.LanguageServer
 {
     public interface IProtocolMethods
     {
-        Task<ResponseMessage> Execute(RequestMessage requestMessage);
+        Task<ResponseMessage> ExecuteAsync(RequestMessage requestMessage);
 
         event Action<object> OnClientRequest;
     }
