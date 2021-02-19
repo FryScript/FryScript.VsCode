@@ -27,7 +27,7 @@ The ```build-server``` command will produce a Visual Studio Code extension that 
 code .
 ```
 
-Once Visual Studio Code has loaded then extension can be run using the ```Launch Extension``` profile from the debug side bar.
+Once Visual Studio Code has loaded the extension can be run using the ```Launch Extension``` profile from the debug side bar.
 
 In the Visual Studio Extension Host create a file with a .fry to enable the language server.
 
